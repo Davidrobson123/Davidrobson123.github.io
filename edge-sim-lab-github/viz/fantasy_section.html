@@ -1,0 +1,24 @@
+  <style>.sside{display:grid;gap:6px;min-width:0}.sside input{width:100%;font:inherit;padding:8px 10px;border-radius:10px;border:1px solid var(--line-strong);background:var(--raised);color:var(--ink)}.sside select{width:100%}</style>
+  <section class="view" id="v-fantasy" hidden>
+    <div class="card">
+      <div class="cardhead">
+        <div><h2 class="h2">Start or sit</h2><div class="sub">How often one player outscores the other across the simulations.</div></div>
+        <div class="seg" role="group" aria-label="Scoring" id="f-scoring"><button type="button" data-w="1" aria-pressed="true">PPR</button><button type="button" data-w="0.5" aria-pressed="false">Half</button><button type="button" data-w="0" aria-pressed="false">Standard</button></div>
+      </div>
+      <div class="ssbox">
+        <div class="sside"><input type="search" id="f-qa" placeholder="Search player or team…" aria-label="Search for the first player" autocomplete="off"><select id="f-ssa" aria-label="First player"></select></div>
+        <span class="label" style="text-align:center">vs</span>
+        <div class="sside"><input type="search" id="f-qb" placeholder="Search player or team…" aria-label="Search for the second player" autocomplete="off"><select id="f-ssb" aria-label="Second player"></select></div>
+      </div>
+      <div id="f-ssres"></div>
+    </div>
+    <div class="card">
+      <div class="cardhead">
+        <div><h2 class="h2">Week rankings</h2><div class="sub">Every modelled player this week, ranked by median fantasy points. Floor to ceiling = a poor game to a big game: 8 in 10 simulated games land between them.</div></div>
+        <div class="seg" role="group" aria-label="Position" id="f-pos"><button type="button" data-p="ALL" aria-pressed="true">All</button><button type="button" data-p="QB" aria-pressed="false">QB</button><button type="button" data-p="RB" aria-pressed="false">RB</button><button type="button" data-p="WR" aria-pressed="false">WR</button><button type="button" data-p="TE" aria-pressed="false">TE</button></div>
+      </div>
+      <div class="small mono" id="f-info" style="margin-bottom:8px"></div>
+      <div class="tablewrap"><table id="f-table"></table></div>
+      <p class="small" style="margin-top:12px">Points: 0.1 per rushing or receiving yard, 1 / 0.5 / 0 per catch (PPR / Half / Standard), 6 per rushing or receiving TD; QBs also 0.04 per passing yard and 4 per passing TD. Interceptions, fumbles, two-point conversions, kickers and defences aren't modelled yet.</p>
+    </div>
+  </section>

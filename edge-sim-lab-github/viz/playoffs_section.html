@@ -1,0 +1,19 @@
+  <section class="view" id="v-playoffs" hidden>
+    <div class="card">
+      <div class="cardhead">
+        <div><h2 class="h2">Playoff picture</h2><div class="sub" id="po-sub"></div></div>
+        <div class="seg" role="group" aria-label="Conference" id="po-conf"><button type="button" data-c="AFC" aria-pressed="true">AFC</button><button type="button" data-c="NFC" aria-pressed="false">NFC</button></div>
+      </div>
+      <div class="tablewrap"><table id="po-table"></table></div>
+      <p class="small" style="margin-top:8px">Seed chances: each square is one seed (1 to 7), darker = likelier. Seeds 1–4 are the division winners, 5–7 the wild cards; only the 1 seed gets a first-round bye.</p>
+    </div>
+    <div class="card">
+      <div class="cardhead"><div><h2 class="h2">If the season ended today</h2><div class="sub">Wild-card weekend as the standings are now: 2 v 7, 3 v 6, 4 v 5, with each conference's 1 seed resting. Each matchup shows the higher seed's chance of winning.</div></div></div>
+      <div class="tablewrap"><svg id="po-bracket" viewBox="0 0 1000 430" role="img" aria-label="Playoff bracket if the season ended today" style="width:100%;min-width:640px;height:auto"></svg></div>
+    </div>
+    <div class="card">
+      <div class="cardhead"><div><h2 class="h2">Super Bowl chances</h2><div class="sub">Share of simulated seasons each team wins it all.</div></div></div>
+      <div id="po-sb"></div>
+      <p class="small" style="margin-top:10px" id="po-method"></p>
+    </div>
+  </section>

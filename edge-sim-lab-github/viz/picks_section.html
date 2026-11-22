@@ -1,0 +1,110 @@
+  <!-- PICKS -->
+  <section class="view" id="v-picks" hidden>
+    <div class="card" id="board-card">
+      <div class="cardhead">
+        <div><h2 class="h2">All games, ranked</h2><div class="sub">Every game this week through the same five tests, in one list: picks first, then leans, then bets to check, highest simulated chance first within each. Prices you type into any game's boxes below are included. Tap Open to see that game's full breakdown.</div></div>
+      </div>
+      <div class="form" style="margin-bottom:10px">
+        <label for="bd-show">Show<select id="bd-show"><option value="pl" selected>Picks and leans</option><option value="all">Every priced bet</option></select></label>
+        <label for="bd-mkt">Market<select id="bd-mkt"><option value="all">All markets</option><option value="side">Game lines</option><option value="td">Anytime TD</option><option value="prop">Player lines</option></select></label>
+        <button class="btn" id="bd-rerun" type="button">Run all again</button>
+        <span class="small mono" id="bd-info"></span>
+      </div>
+      <div id="bd-sum"></div>
+      <div class="tablewrap"><table id="bd-table"></table></div>
+      <details style="margin-top:14px"><summary class="small" style="cursor:pointer"><strong>Most likely touchdown scorers, no price yet</strong></summary>
+        <p class="small" style="margin:6px 0 8px">The 25 highest simulated chances across every game. Fair price = no edge either way. If your app offers the "worth it at" price or more, type it into that game's touchdown box to run it through the tests.</p>
+        <div class="tablewrap"><table id="bd-td"></table></div>
+      </details>
+    </div>
+    <div class="card">
+      <div class="cardhead">
+        <div><h2 class="h2">Bet builder</h2><div class="sub">Pick a market, choose a team or player, set the line and add it. Every leg is checked against the same simulated games, so legs that go together (a team winning and its running back scoring) are priced together.</div></div>
+        <span class="example" id="exampleflag">Example legs</span>
+      </div>
+      <div class="form">
+        <label for="lt">Market<select id="lt">
+          <option value="win">To win</option><option value="spread">Handicap</option><option value="total">Total points</option>
+          <option value="teamtotal">Team points</option><option value="td">Anytime TD</option><option value="rush">Rushing yards</option>
+          <option value="rec">Receiving yards</option><option value="recs">Receptions</option><option value="pass">Passing yards</option>
+        </select></label>
+        <label for="lsel" id="lsel-l">Team or player<select id="lsel"></select></label>
+        <label for="lou" id="lou-l">Over/under<select id="lou"><option value="over">Over</option><option value="under">Under</option></select></label>
+        <label for="lline" id="lline-l">Line<input id="lline" type="number" step="0.5" value="0.5" style="width:90px"></label>
+        <button class="btn primary" id="addleg" type="button">Add leg</button>
+      </div>
+      <div class="legs" id="bb-legs"></div>
+      <div class="result" id="bb-res"></div>
+      <div class="form" style="margin-top:16px">
+        <label for="bbprice">Bookmaker's price<input id="bbprice" type="text" inputmode="decimal" placeholder="4.50, 7/2 or +350" style="width:150px"></label>
+        <button class="btn" id="bbclear" type="button">Clear legs</button>
+      </div>
+      <div id="bb-verdict"></div>
+      <p class="small" style="margin-top:12px">Priced on the simulation alone (no market blend for builders), from this page's simulated games: use 50,000 simulations for long prices. Bookmakers often limit which legs can be combined.</p>
+    </div>
+
+    <div class="card">
+      <div class="cardhead">
+        <div><h2 class="h2">This game's picks</h2><div class="sub">The simulations compared with the most accurate market odds available, margin removed. Each pick shows the lowest price worth taking: check it against your own betting apps. Stakes are suggestions sized from the bankroll setting below: only bet what you can afford to lose.</div></div>
+      </div>
+      <div id="picksum"></div>
+    </div>
+
+    <details class="card numbers"><summary class="h2" style="cursor:pointer">How each bet was judged</summary>
+      <div class="form" style="margin:12px 0">
+        <label for="bank">Bankroll (£)<input id="bank" type="number" min="10" step="10" value="100" style="width:100px"></label>
+        <label for="minprob">Minimum chance to land (%)<input id="minprob" type="number" min="5" max="95" step="5" value="25" style="width:90px"></label>
+        <span class="small" id="pricesrc"></span>
+      </div>
+      <div class="whatpick">
+        <div class="label" style="margin-bottom:6px">What makes a pick</div>
+        <ol class="small" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:3px">
+          <li><strong>It lands often enough:</strong> wins in at least a quarter of the simulated games (change the minimum above), so anytime scorers can qualify but long shots can't.</li>
+          <li><strong>The simulation is clearly ahead of the market:</strong> by at least 3 percentage points.</li>
+          <li><strong>It's worth the price:</strong> at least 3p profit expected per £1 on game lines, and at least 7p on player bets (touchdowns, yards, receptions), where the simulation's numbers are less certain.</li>
+          <li><strong>The market price is reliable:</strong> it comes from several bookmakers combined, or from a betting exchange, not one bookmaker.</li>
+          <li><strong>The player's role is his own:</strong> no more than 40% of his work comes from teammates ruled out.</li>
+        </ol>
+        <p class="small" style="margin:6px 0 0">All five must pass. <strong>Inherited</strong> tags show how much of a player's work tonight comes from teammates who are out. For example, 28% inherited on Swift means about a quarter of his carries, targets and goal-line chances in the simulation are Monangai's.</p>
+        <p class="small" style="margin:6px 0 0"><strong>Lean</strong> = a real edge (at least 60% of the pick bar) that fails one of the tests, or falls just short of the bar. <strong>No bet</strong> = little or no edge at this price. <strong>Check news</strong> = the simulation and the market are more than 12 points apart.</p>
+      </div>
+      <details style="margin-top:12px"><summary class="small" style="cursor:pointer">How a price becomes a pick</summary>
+        <ol class="small" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:4px">
+          <li>The simulation gives a probability for the bet (for example Swift scores in 58% of 10,000 simulated games).</li>
+          <li>The most accurate market odds are turned into a probability with the bookmaker margin removed. For spreads, totals and moneylines that's the US closing-line consensus, the hardest number in betting to beat.</li>
+          <li>The two are blended, because the market knows things the model doesn't: 50/50 for sides and totals (sharp markets), 70% model for player props.</li>
+          <li>A <strong>pick</strong> has to pass every test: it lands in at least the minimum share of simulations (25% unless you change it); the simulation is at least 3 points ahead of the market; the blended chance beats the margin-free market by at least 3% on game lines or 7% on player bets; the market chance comes from a consensus of bookmakers or an exchange, not one bookmaker; and no more than 40% of the player's role is an injured teammate's work.</li>
+          <li>A real edge that fails a test, or falls just short, is a <strong>lean</strong>, listed with the reason. Smaller edges are <strong>no bet</strong>: they win about as often as the market expects, so they aren't worth listing. Only one pick per player and one game-line pick per game; any weaker ones become leans.</li>
+          <li><strong>No Thursday-night games:</strong> their bets are still shown and judged, but never become picks or leans.</li>
+          <li><strong>Take at or above</strong> = the lowest price that still gives the required edge (+3% on game lines, +7% on player bets) on the blended probability. If your app offers that or more, it qualifies; less, skip it.</li>
+          <li>If the model and the market are more than 12 points apart, it's flagged <strong>check news</strong> instead: that usually means the model is missing something (an injury, a role change), not that the bookmaker is wrong.</li>
+          <li>Stake = a quarter of the Kelly stake, capped at 2% of the bankroll. One bet per player.</li>
+        </ol>
+      </details>
+      <div class="card" style="box-shadow:none;padding-inline:0">
+        <div class="cardhead"><div><h2 class="h2">Bet by bet</h2><div class="sub">Each bet against the five tests, picks first, then the closest calls.</div></div>
+          <label class="small" for="cknum">Show<select id="cknum"><option value="8" selected>8 bets</option><option value="16">16 bets</option><option value="60">All</option></select></label></div>
+        <div class="cks" id="pk-checks"></div>
+      </div>
+      <div class="card" style="box-shadow:none;padding-inline:0">
+        <div class="cardhead"><div><h2 class="h2">Game markets</h2><div class="sub">Moneyline, handicap and total, against the US closing-line consensus with the margin removed. Tick a bet to add it to the bet builder.</div></div></div>
+        <div class="tablewrap"><table id="pk-game"></table></div>
+      </div>
+      <div class="card" style="box-shadow:none;padding-inline:0">
+        <div class="cardhead"><div><h2 class="h2">Anytime touchdown</h2><div class="sub">Market price for each player (decimal, fractional or American). It's turned into a chance with an assumed 6% margin, since only one side is priced. Prefilled from a tipster page where available.</div></div></div>
+        <div class="tablewrap"><table id="pk-td"></table></div>
+      </div>
+      <div class="card" style="box-shadow:none;padding-inline:0">
+        <div class="cardhead"><div><h2 class="h2">Player lines</h2><div class="sub">Over/under lines with both prices. Add your own below.</div></div></div>
+        <div class="tablewrap"><table id="pk-props"></table></div>
+        <div class="form" style="margin-top:12px">
+          <label for="ap-pl">Player<select id="ap-pl"></select></label>
+          <label for="ap-st">Stat<select id="ap-st"><option value="rush">Rushing yards</option><option value="rec">Receiving yards</option><option value="recs">Receptions</option><option value="pass">Passing yards</option></select></label>
+          <label for="ap-ln">Line<input id="ap-ln" type="number" step="0.5" style="width:80px"></label>
+          <label for="ap-ov">Over price<input id="ap-ov" type="text" placeholder="1.91 or -110" style="width:110px"></label>
+          <label for="ap-un">Under price<input id="ap-un" type="text" placeholder="1.91 or -110" style="width:110px"></label>
+          <button class="btn" id="ap-add" type="button">Add line</button>
+        </div>
+      </div>
+    </details>
+  </section>

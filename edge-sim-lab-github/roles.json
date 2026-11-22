@@ -1,0 +1,5 @@
+{
+  "_note": "Hand-set roles for players new to a team (trade arrivals) until their season numbers catch up. Shares of the team's targets (tgt), receiving yards (rec) and red-zone targets (rz). Remove a player once he has 3-4 games with his new team.",
+  "KC|Josh Downs": {"tgt": 0.16, "rec": 0.15, "rz": 0.14},
+  "SF|Keenan Allen": {"tgt": 0.22, "rec": 0.18, "rz": 0.18}
+}

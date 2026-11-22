@@ -1,0 +1,926 @@
+<title>Edge Sim Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@700;800&family=Archivo:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: a night trading screen — game ribbon on top, the broadcast field as the hero, stat panels beneath. Tokens from The Edge design system. */
+:root{
+  --surface:#f2f6f7;--raised:#ffffff;--sunken:#e4ecef;--line:#cbd9de;--line-strong:#6b8290;
+  --ink:#06131d;--muted:#4b5f6c;--pitch:#0b7a41;--pitch-soft:#ddf6e8;--on-pitch:#ffffff;
+  --aqua:#00736a;--aqua-soft:#d5f4f0;--mist:#247069;--loss:#b23a1b;--loss-soft:#fbe3da;--caution:#865600;--caution-soft:#fbefd3;
+  --focus:#00736a;--midnight:#040e19;
+  --shadow-card:0 1px 2px #06131d14,0 2px 8px #06131d0f;--glow:0 0 0 1px #0b7a4166,0 4px 16px #0b7a411f;
+  --f-display:Unbounded,"Arial Black",system-ui,sans-serif;--f-sans:Archivo,"Helvetica Neue",Arial,sans-serif;--f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --r-sm:4px;--r-md:10px;--r-lg:24px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --surface:#040e19;--raised:#0b1a28;--sunken:#02080c;--line:#1b3143;--line-strong:#4a6a80;
+  --ink:#f5f8f9;--muted:#8fa3b2;--pitch:#3ced85;--pitch-soft:#0a3526;--on-pitch:#04121c;
+  --aqua:#09f0dc;--aqua-soft:#06302e;--mist:#69d7c9;--loss:#ff8a66;--loss-soft:#3a1a12;--caution:#f5b83d;--caution-soft:#3a2a08;
+  --focus:#09f0dc;--shadow-card:0 0 0 1px #1b3143;--glow:0 0 0 1px #3ced8566,0 0 32px #3ced8526;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --surface:#040e19;--raised:#0b1a28;--sunken:#02080c;--line:#1b3143;--line-strong:#4a6a80;
+  --ink:#f5f8f9;--muted:#8fa3b2;--pitch:#3ced85;--pitch-soft:#0a3526;--on-pitch:#04121c;
+  --aqua:#09f0dc;--aqua-soft:#06302e;--mist:#69d7c9;--loss:#ff8a66;--loss-soft:#3a1a12;--caution:#f5b83d;--caution-soft:#3a2a08;
+  --focus:#09f0dc;--shadow-card:0 0 0 1px #1b3143;--glow:0 0 0 1px #3ced8566,0 0 32px #3ced8526;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--surface);color:var(--ink);font:15px/23px var(--f-sans);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+.wrap{max-width:1180px;margin:0 auto}
+h1,h2,h3{margin:0;text-wrap:balance}
+.mono,.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.label{font:600 12px/16px var(--f-sans);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.small{font-size:12px;line-height:18px;color:var(--muted)}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+header.top{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding-block:20px 12px}
+.logo{background:var(--midnight);border-radius:var(--r-md);padding:6px 10px;display:flex;align-items:center}
+.logo img{height:32px;width:auto;display:block}
+.brandtxt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.brandtxt h1{font:800 22px/26px var(--f-display);letter-spacing:-.01em}
+nav.tabs{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+nav.tabs a{padding:8px 14px;border-radius:var(--r-md);text-decoration:none;color:var(--muted);font-weight:600;border:1px solid transparent}
+nav.tabs a[aria-current="page"]{color:var(--ink);background:var(--raised);border-color:var(--line);box-shadow:var(--shadow-card)}
+nav.tabs a:hover{color:var(--ink)}
+.ribbon{display:flex;gap:8px;overflow-x:auto;padding-block:8px 12px;scrollbar-width:thin}
+.chip{flex:0 0 auto;display:flex;flex-direction:column;gap:4px;padding:10px 12px;border-radius:var(--r-md);background:var(--raised);border:1px solid var(--line);cursor:pointer;text-align:left;min-width:138px}
+.chip[aria-pressed="true"]{border-color:var(--pitch);box-shadow:var(--glow)}
+.chip .row{display:flex;align-items:center;gap:6px;justify-content:space-between}
+.badge{display:inline-flex;align-items:center;justify-content:center;font:700 11px/1 var(--f-mono);letter-spacing:.02em;border-radius:var(--r-sm);padding:4px 5px;min-width:34px}
+.badge.lg{font-size:18px;padding:10px 8px;min-width:64px;border-radius:var(--r-md)}
+.card{background:var(--raised);border-radius:var(--r-md);box-shadow:var(--shadow-card);padding:16px}
+@media (min-width:760px){.card{padding:24px}}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:1fr}
+@media (min-width:860px){.g2{grid-template-columns:1fr 1fr}}
+section.view{display:flex;flex-direction:column;gap:16px}
+.matchup{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center}
+.teamblk{display:flex;align-items:center;gap:12px;min-width:0}
+.teamblk.home{justify-content:flex-end;text-align:right}
+.teamblk .nm{font:700 15px/20px var(--f-sans)}
+.teamblk .pts{font:700 34px/38px var(--f-mono)}
+.teamblk .wp{font:500 13px/18px var(--f-mono);color:var(--muted)}
+.mid{text-align:center;display:flex;flex-direction:column;gap:4px}
+@media (max-width:560px){.matchup{grid-template-columns:1fr 1fr}.mid{grid-column:1/-1;order:3}.teamblk .pts{font-size:26px}.badge.lg{font-size:14px;min-width:48px;padding:8px 6px}}
+.winbar{height:8px;border-radius:9999px;overflow:hidden;display:flex;background:var(--sunken);margin-top:12px}
+.winbar span{display:block;height:100%}
+.pills{display:flex;gap:6px;flex-wrap:wrap}
+.pill{font:500 12px/16px var(--f-mono);padding:4px 8px;border-radius:9999px;background:var(--sunken);color:var(--ink)}
+.pill b{color:var(--muted);font-weight:500}
+.inj{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:14px;line-height:20px}
+.tdm{color:var(--pitch);margin-left:1px}
+.beat{display:block;color:var(--muted);font-family:var(--f-sans)}
+.stp{font:600 11px/16px var(--f-sans);letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:var(--r-sm);background:var(--sunken);color:var(--muted);white-space:nowrap}
+.stp.good{background:var(--pitch-soft);color:var(--pitch)}.stp.meh{background:var(--caution-soft);color:var(--caution)}.stp.bad{background:var(--loss-soft);color:var(--loss)}
+tr.pkrow td{background:var(--pitch-soft)}
+.whatpick{background:var(--sunken);border-radius:var(--r-md);padding:12px 14px;margin-bottom:12px}
+.cks{display:grid;gap:12px;grid-template-columns:1fr}
+@media (min-width:860px){.cks{grid-template-columns:1fr 1fr}}
+.ck{border:1px solid var(--line);border-radius:var(--r-md);padding:12px 14px;background:var(--surface)}
+.ck.pick{border-color:var(--pitch);box-shadow:var(--glow)}
+.ck-h{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.ck-l{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:13.5px;line-height:19px}
+.ck-l li{display:grid;grid-template-columns:16px 1fr;gap:6px}
+.ck-l li.ok span:first-child{color:var(--pitch);font-weight:700}
+.ck-l li.no span:first-child{color:var(--loss);font-weight:700}
+.ck-l li.warn{color:var(--loss)} .ck-l li.warn span:first-child{font-weight:700}
+details.numbers>summary{list-style:revert}
+.qtag{font:700 10px/1 var(--f-mono);color:var(--caution);background:var(--caution-soft);border-radius:var(--r-sm);padding:2px 4px;margin-left:4px;vertical-align:1px}
+.fieldwrap{position:relative;border-radius:var(--r-md);overflow:hidden;background:#0d3523}
+.fieldwrap svg{display:block;width:100%;height:auto}
+.scorebug{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:space-between;margin-bottom:12px}
+.sb-score{display:flex;align-items:center;gap:10px;font:700 20px/24px var(--f-mono)}
+.sb-score .q{font:600 12px/16px var(--f-sans);letter-spacing:.08em;color:var(--muted);text-transform:uppercase}
+.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{border:1px solid var(--line-strong);background:var(--raised);padding:7px 12px;border-radius:var(--r-md);cursor:pointer;font-weight:600}
+.btn.primary{background:var(--pitch);color:var(--on-pitch);border-color:var(--pitch)}
+.btn:hover{border-color:var(--ink)}
+select,input[type=number],input[type=text]{background:var(--raised);border:1px solid var(--line-strong);border-radius:var(--r-sm);padding:6px 8px}
+.ticker{font:500 14px/20px var(--f-mono);color:var(--ink);background:var(--sunken);border-radius:0 0 var(--r-md) var(--r-md);padding:8px 12px;min-height:36px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.ticker .dd{font-weight:700;color:var(--aqua)} .ticker .cl{color:var(--muted)}
+.h3{font:700 16px/22px var(--f-sans);margin:0}
+.wpwrap svg{width:100%;height:auto;display:block}
+.log{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;max-height:300px;overflow:auto;border-top:1px solid var(--line)}
+.log li{display:grid;grid-template-columns:32px 46px 1fr auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px;line-height:20px}
+.log li.score{font-weight:600}
+.log li.note{display:block;padding:6px 0;color:var(--muted)}
+.log .q{font:600 12px/16px var(--f-mono);color:var(--muted)}
+.log .sc{font:500 13px/18px var(--f-mono);color:var(--muted);white-space:nowrap}
+.log .res-TD{color:var(--pitch)}
+.chart svg{width:100%;height:auto;display:block}
+.chart text{fill:var(--muted);font:11px var(--f-mono)}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{font:600 11px/16px var(--f-sans);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px 10px;background:var(--sunken);white-space:nowrap;cursor:default}
+th.sortable{cursor:pointer}
+td{padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td.num,th.num{text-align:right}
+.nv{display:inline-block;width:3.2ch;text-align:right}
+.range{position:relative;height:8px;width:110px;background:var(--sunken);border-radius:9999px;display:inline-block;vertical-align:middle;margin-left:8px}
+.range i{position:absolute;top:0;bottom:0;border-radius:9999px;background:var(--aqua);opacity:.55}
+.range b{position:absolute;top:-3px;width:3px;height:14px;background:var(--ink);border-radius:2px}
+.h2{font:700 20px/28px var(--f-sans)}
+.sub{color:var(--muted);font-size:14px;line-height:20px}
+.cardhead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.legs{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+.leg{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface)}
+.leg .p{font:500 13px/18px var(--f-mono);color:var(--muted)}
+.x{border:0;background:none;color:var(--muted);cursor:pointer;font-size:18px;line-height:1;padding:4px 6px;border-radius:var(--r-sm)}
+.x:hover{color:var(--loss)}
+.form{display:flex;gap:8px;flex-wrap:wrap;align-items:end}
+.form label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);min-width:0}
+.form select{max-width:220px}
+.result{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:8px}
+.stat{background:var(--sunken);border-radius:var(--r-md);padding:12px}
+.stat .v{font:700 28px/32px var(--f-mono);margin-top:4px}
+.stat .v.pitch{color:var(--pitch)}
+.verdict{margin-top:12px;padding:10px 12px;border-radius:var(--r-md);font-weight:600}
+.verdict.good{background:var(--pitch-soft);color:var(--pitch)}
+.verdict.bad{background:var(--loss-soft);color:var(--loss)}
+.verdict.meh{background:var(--caution-soft);color:var(--caution)}
+.example{font:600 11px/16px var(--f-sans);letter-spacing:.08em;text-transform:uppercase;color:var(--caution);background:var(--caution-soft);border-radius:var(--r-sm);padding:2px 6px}
+.seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:var(--r-md);overflow:hidden}
+.seg button{border:0;background:none;padding:6px 12px;cursor:pointer;font-weight:600;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+.ssbox{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center}
+@media (max-width:640px){.ssbox{grid-template-columns:1fr}}
+.ssres{font:700 22px/28px var(--f-sans);margin-top:12px}
+.prose{max-width:68ch}
+.prose p{margin:0 0 12px}
+footer{margin-top:32px;font-size:12px;line-height:18px;color:var(--muted);max-width:80ch}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;font-size:14px}
+.kv dt{color:var(--muted)}.kv dd{margin:0;font-family:var(--f-mono)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.tg-sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:6px 0 14px}
+.tg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.tg-team{border:1px solid var(--line, rgba(127,127,127,.25));border-radius:12px;padding:12px 14px}
+.tg-head{display:flex;align-items:center;gap:8px;margin-bottom:2px}
+.tg-sec{margin-top:10px;display:grid;gap:3px}
+.tg-big{font-size:1.5rem;font-weight:700;white-space:nowrap}
+.sbbug{display:inline-flex;align-items:stretch;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.25);font:700 18px/22px var(--f-mono)}
+.sbbug .sbt{display:inline-flex;align-items:center;gap:8px;padding:6px 12px}
+.sbbug .sbt b{font:800 13px/16px var(--f-sans);letter-spacing:.06em}
+.sbbug .sbt .pts{font:800 22px/24px var(--f-mono);min-width:26px;text-align:right}
+.sbbug .sbt .pos{font-size:14px;visibility:hidden}
+.sbbug .sbt.has .pos{visibility:visible}
+.sbbug .q{display:inline-flex;align-items:center;padding:6px 12px;background:var(--ink);color:var(--surface);font:700 12px/16px var(--f-sans);letter-spacing:.08em;text-transform:uppercase}
+.log li{grid-template-columns:32px 46px 1fr 110px auto}
+.dchart{position:relative;height:8px;border-radius:4px;background:var(--sunken);overflow:hidden}
+.dchart span{position:absolute;top:0;bottom:0;border-radius:4px}
+@media (max-width:640px){ .log li{grid-template-columns:28px 44px 1fr auto} .dchart{display:none} .sbbug .sbt{padding:6px 8px} }
+.leaders{margin-top:10px;font-size:13px;line-height:18px}
+.leaders .ldr{display:grid;grid-template-columns:52px 1fr 1fr 1fr;gap:8px;align-items:center;padding:4px 0;border-bottom:1px solid var(--line)}
+.leaders .ldr.head{color:var(--muted);font:700 11px/14px var(--f-sans);letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid var(--line-strong)}
+.boxwrap{padding:12px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--sunken)}
+.boxgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:12px}
+.boxt{table-layout:fixed}.boxt td{overflow-wrap:anywhere}.boxt td:first-child{width:46%}
+.boxwrap,.boxteam{min-width:0}
+.fieldwrap svg,#wpsvg{max-width:100%;overflow:hidden}
+.wpwrap,.leaders{overflow:hidden}
+.boxhead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.boxt{width:100%;font-size:13px}.boxt td{padding:3px 0;border-bottom:1px solid var(--line)}.boxt td:last-child{text-align:right}
+.bigplays{margin:0;padding-left:18px;display:grid;gap:6px;font-size:13px}.bigplays li{display:list-item}
+#wpsvg{cursor:pointer}
+@media (max-width:640px){ .leaders .ldr{grid-template-columns:44px 1fr 1fr 1fr;font-size:12px;gap:6px} }
+.glrec{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:baseline;margin:0 0 12px;padding:10px 12px;border-radius:var(--r-md);background:var(--sunken);font-size:13px}
+.glrec .label{width:100%}
+.glhead{display:grid;grid-template-columns:120px 1fr 90px 1.3fr;gap:10px;padding:0 10px 6px;color:var(--muted)}
+.gllist{display:grid;gap:6px}
+.glrow{display:grid;grid-template-columns:120px 1fr 90px 1.3fr;gap:10px;align-items:center;text-align:left;width:100%;padding:10px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--raised);color:var(--ink);font:inherit;cursor:pointer}
+.glrow:hover{border-color:var(--line-strong)} .glrow.on{border-color:var(--accent,#2a9d8f);box-shadow:0 0 0 1px var(--accent,#2a9d8f) inset}
+.glrow.done{opacity:.55}
+.glteams{display:flex;align-items:center;gap:8px}.glsc{font-size:18px;font-weight:800}
+@media (max-width:640px){ .glhead{display:none} .glrow{grid-template-columns:1fr auto;grid-template-areas:"teams fav" "when sco";row-gap:4px}
+  .glteams{grid-area:teams}.glfav{grid-area:fav;text-align:right}.glwhen{grid-area:when}.glsco{grid-area:sco;text-align:right} }
+.pobar{display:inline-block;vertical-align:middle;width:90px;height:8px;border-radius:4px;background:var(--sunken);overflow:hidden}.pobar span{display:block;height:100%;border-radius:4px}
+.pobar.big{width:auto;flex:1;height:12px}.posb{display:flex;align-items:center;gap:10px;margin:6px 0}.posb .mono{width:52px;text-align:right}
+.smo{display:none}
+@media (max-width:640px){ .lgo{display:none} .smo{display:inline} #po-table th:nth-child(2),#po-table td:nth-child(2),#po-table th:nth-child(3),#po-table td:nth-child(3),#po-table th:nth-child(5),#po-table td:nth-child(5),#po-table th:nth-child(6),#po-table td:nth-child(6){display:none}
+  #po-table td,#po-table th{padding-left:4px;padding-right:4px} #po-table .pobar{display:none} #po-table td:first-child .small{display:none} #po-table{font-size:12px} .poheat{gap:1px} .poheat i{width:12px;height:16px;font-size:8px;line-height:16px;border-radius:3px} }
+.poheat{display:inline-flex;gap:2px}.poheat i{width:18px;height:18px;border-radius:4px;font:700 10px/18px var(--f-mono);text-align:center;font-style:normal;color:var(--ink)}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="logo"><img src="data:image/jpeg;base64,__LOGO__" alt="The Edge"></div>
+    <div class="brandtxt">
+      <h1>Sim Lab</h1>
+      <span class="small" id="meta"></span>
+    </div>
+    <nav class="tabs" aria-label="Sections">
+      <a href="#games" data-view="games">Game centre</a>__PICKS_NAV__
+      <a href="#model" data-view="model">How it works</a>
+    </nav>
+  </header>
+  <div class="small" role="note" style="margin:-4px 0 12px;padding:8px 12px;border-radius:10px;background:color-mix(in srgb, currentColor 7%, transparent)">Simulations for entertainment, not betting advice · 18+ · <a href="https://www.begambleaware.org" rel="noopener" target="_blank">BeGambleAware.org</a></div>
+
+  <div class="ribbon" id="ribbon" role="group" aria-label="Choose a game"></div>
+
+  <!-- GAME CENTRE -->
+  <section class="view" id="v-games">
+    <div class="card" id="glance"></div>
+    <div class="card" id="matchup"></div>
+    <div class="card" id="typical"></div>
+    <div class="card">
+      <div class="cardhead">
+        <div><h2 class="h2">Watch a simulation</h2><div class="sub">One simulated game, drive by drive. New simulation plays a fresh one from the same model.</div></div>
+      </div>
+      <div class="scorebug">
+        <div class="sb-score" id="sbscore"></div>
+        <div class="controls">
+          <button class="btn primary" id="play" type="button">Play</button>
+          <button class="btn" id="step" type="button">Next drive</button>
+          <button class="btn" id="resim" type="button">New simulation</button>
+          <button class="btn" id="typgame" type="button" title="Replay a simulation that matches the typical game: same final score and scorers where possible">Watch the typical game</button>
+          <label class="small" for="speed">Speed</label>
+          <select id="speed"><option value="0.6">Slow</option><option value="1" selected>Normal</option><option value="2.5">Fast</option></select>
+        </div>
+      </div>
+      <div class="fieldwrap"><svg id="field" viewBox="0 0 1200 300" role="img" aria-label="Football field showing the current drive"></svg></div>
+      <div class="ticker" id="ticker" aria-live="polite"></div>
+      <div class="leaders" id="leaders"></div>
+      <div class="wpwrap">
+        <div class="cardhead" style="margin:14px 0 4px"><div><h3 class="h3">Win probability and momentum</h3><div class="small">Each team's chance of winning after every play, re-simulated from that moment. Bars show how much each drive swung it. Tap the chart to jump to that moment.</div></div><span class="mono" id="wpnow"></span></div>
+        <svg id="wpsvg" viewBox="0 0 1200 330" role="img" aria-label="Win probability after every play, with momentum bars per drive"></svg>
+      </div>
+      <ol class="log" id="log" aria-live="polite"></ol>
+    </div>
+    <div class="card">
+      <div class="cardhead"><div><h2 class="h2">Player projections</h2><div class="sub">Big number = median (the typical game). Underneath: low – high, a poor game and a big game; 8 in 10 simulated games land between them. TD chance is the share of simulations where the player scores.</div></div></div>
+      <div class="tablewrap"><table id="ptable"></table></div>
+    </div>
+  </section>
+
+__PICKS_SECTION__
+  <!-- MODEL -->
+  <section class="view" id="v-model" hidden>
+    <div class="card prose">
+      <h2 class="h2" style="margin-bottom:12px">How the simulation works</h2>
+      <p>The simulations run here in the page, on your phone or computer: pick a game, choose how many simulations, and press Run again for a fresh set. Each simulated game gives both teams a number of drives, and each drive ends in a touchdown, a field goal or nothing, at rates set by that offence against that defence, recent games weighted most. Yards follow from how well the drives went, and each team's yards, catches and touchdowns are shared out to players by their recent usage: carries, targets and red-zone work.</p>
+      <p>For scheduled games, team scoring is anchored to the betting line, which is more accurate than any team rating we've built so far. The engine's job is everything below team level: who scores, who gets the yards, and how all of it moves together.</p>
+      <p>Every simulation uses the rosters and injury reports as of the time shown at the top of the page; players ruled out late on game day may not be included. Players on injured reserve, cut or traded, and anyone listed Out or Doubtful for that week, are left out and their carries and targets go to teammates at the same position. Questionable players stay in, marked Q. Weekly injury reports come out Wednesday to Friday, so Sim Lab is refreshed after the final report.</p>
+      <p>Each simulated game starts with a coin toss: the winner defers, the other team receives, and the roles swap at half-time, so the team receiving a half can get the extra drive. Tied games go to overtime under the 2025 rules (both teams get the ball, then sudden death, a tie if still level after ten minutes). Home field is worth about 1.7 points, plus about 0.25 points per day of rest advantage, both measured from betting lines on 2,960 games since 2015. Neutral sites get no home edge.</p>
+      <p>Each defence's pattern is used too: if it gives up more catches or touchdowns to tight ends, say, the simulation leans that way for the tight ends it faces, without changing the team's total. Wind over 10 mph cuts passing yards by about 1.3% per mph, field goals by 1.1% and touchdowns by 0.8%, and freezing temperatures cut field goals, all measured on 2024–26 outdoor games. For open-air stadiums the page fetches the kick-off forecast automatically where it can (from Open-Meteo); where it can't, and for indoor games, there's no weather adjustment.</p>
+      <p>Watch a simulation plays one game out snap by snap: down and distance, the line of scrimmage (blue), the first-down line (yellow) and the game clock. After every play the rest of the game is re-simulated a few hundred times from that moment, which gives the win-probability line. The momentum bars show how far each drive moved it.</p>
+      <p>Player numbers are built from opportunities: each simulated game gives a player targets, some become catches and each catch carries its own yards; rushing works the same way through carries. A player with no catch gets no receiving yards. A player's share of the work also varies from game to game (snap counts, game script, early exits), more so for smaller roles, and regulars who are on the field a lot keep a fair chance of being thrown to even if their target count is low.</p>
+      <p>When the betting market expects a team to score less than usual, for example with a backup quarterback, its passing and rushing yards drop with it. International games have tended to go under the total, so they get 1 point off it.</p>
+      <p><strong>Low – high</strong> under each median is a poor game and a big game: 8 in 10 simulated games land between them. <strong>The typical game</strong> is one box score built from every simulation: each team's median score, the players most likely to score its touchdowns and each player's median line. It is the middle of all the simulations, not a prediction of the exact result.</p>
+      <p>The Game centre shows simulations only: the percentages are the sim's view of each outcome, to compare with whatever prices you see. Where a Picks tab is included, it compares the simulations with market prices using fixed, published rules; it isn't advice, and no bet is ever certain. Where a Fantasy tab is included, it turns the same simulations into fantasy points.</p>
+      <!--TRACK--><h3 class="label" style="margin:20px 0 8px">Track record: 2026 weeks 3–8 replayed (89 games, 1,886 players)</h3>
+      <p class="small">Each week re-simulated with today's simulator, using only what was known before that week. Some settings were tuned on these weeks, so the live weeks below are the real test.</p>
+      <div class="tablewrap"><table>
+        <tr><th>Touchdown chance we gave</th><th class="num">Players</th><th class="num">We said</th><th class="num">Actually scored</th></tr>
+        <tr><td class="">Under 10%</td><td class="num mono">606</td><td class="num mono">6%</td><td class="num mono">5%</td></tr><tr><td class="">10–20%</td><td class="num mono">588</td><td class="num mono">15%</td><td class="num mono">15%</td></tr><tr><td class="">20–30%</td><td class="num mono">360</td><td class="num mono">25%</td><td class="num mono">27%</td></tr><tr><td class="">30–40%</td><td class="num mono">183</td><td class="num mono">34%</td><td class="num mono">36%</td></tr><tr><td class="">40–50%</td><td class="num mono">73</td><td class="num mono">45%</td><td class="num mono">41%</td></tr><tr><td class="">50% and over</td><td class="num mono">76</td><td class="num mono">61%</td><td class="num mono">62%</td></tr>
+      </table></div>
+      <div class="tablewrap" style="margin-top:12px"><table>
+        <tr><th>Other checks</th><th class="num">Result</th></tr>
+        <tr><td>Rushing, receiving and passing yards inside the low – high range (target 80%)</td><td class="num mono">83%</td></tr>
+        <tr><td>Who wins: accuracy score, sim vs betting market (lower is better)</td><td class="num mono">0.223 vs 0.226</td></tr>
+        <tr><td>Winning margin: average miss</td><td class="num mono">8.9 pts</td></tr>
+      </table></div>
+      
+      
+      <h3 class="label" style="margin:20px 0 8px">Live weeks: recorded before kick-off</h3>
+      <div class="tablewrap"><table>
+        <tr><th>Week</th><th class="num">Games</th><th class="num">Favourite won</th><th class="num">Who wins: sim vs market</th><th class="num">Yards inside range</th><th class="num">Top-3 scorers: said / scored</th></tr>
+        <tr><td class="">Week 9</td><td class="num mono">15</td><td class="num mono">14 of 15</td><td class="num mono">0.135 vs 0.123</td><td class="num mono">86%</td><td class="num mono">35% / 31%</td></tr><tr><td class="">Week 10</td><td class="num mono">14</td><td class="num mono">9 of 14</td><td class="num mono">0.203 vs 0.191</td><td class="num mono">81%</td><td class="num mono">34% / 36%</td></tr><tr><td class="">Week 11</td><td class="num mono">1</td><td class="num mono">1 of 1</td><td class="num mono">0.023 vs 0.023</td><td class="num mono">93%</td><td class="num mono">33% / 17%</td></tr>
+      </table></div>
+      <p class="small">Live weeks use whichever simulator was live that week, so they show honestly how the published numbers did.</p><!--/TRACK--><p class="small" style="margin-top:12px">Data: <a href="https://github.com/nflverse" rel="noopener">nflverse</a> (play-by-play, rosters, injury reports, schedules and closing betting lines).</p>
+      <h3 class="label" style="margin:20px 0 8px">This week's data</h3>
+      <dl class="kv" id="modelkv"></dl>
+    </div>
+  </section>
+
+  <footer>Odds may have moved, so check the live price before placing any bet. Informational content built from public data and simulations, not betting advice. Simulations show likely ranges, not certainties. Please gamble responsibly (18+), BeGambleAware.org. Team colours from nflverse; team logos are not shown.</footer>
+</div>
+
+<script type="application/json" id="data">__DATA__</script>
+<script>__SIMCORE__</script>
+<script>
+(function(){
+"use strict";
+const D = JSON.parse(document.getElementById("data").textContent);
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt1 = x => (Math.round(x*10)/10).toFixed(1);
+const pct = (p, d=0) => (p*100).toFixed(d) + "%";
+const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// ---------- colours ----------
+function rgb(h){h=h.replace("#","");if(h.length===3)h=h.split("").map(c=>c+c).join("");const n=parseInt(h,16);return[(n>>16)&255,(n>>8)&255,n&255]}
+function lum(h){const c=rgb(h).map(v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)});return .2126*c[0]+.7152*c[1]+.0722*c[2]}
+function contrast(a,b){const x=lum(a),y=lum(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05)}
+function textOn(bg){return contrast(bg,"#ffffff")>=contrast(bg,"#06131d")?"#ffffff":"#06131d"}
+function cssVar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()||"#0b1a28"}
+function visible(team,bg){ // team colour that reads on bg
+  if(contrast(team.c1,bg)>=1.9) return team.c1;
+  if(team.c2 && contrast(team.c2,bg)>=1.9) return team.c2;
+  return cssVar("--mist");
+}
+function badge(t,cls=""){return `<span class="badge ${cls}" style="background:${t.c1};color:${textOn(t.c1)}">${esc(t.abbr)}</span>`}
+
+// ---------- odds ----------
+function fracOdds(dec){
+  if(!isFinite(dec)) return "–";
+  const x=dec-1; let best=[1,1],err=1e9;
+  for(let d=1;d<=20;d++){const n=Math.round(x*d); if(n<1) continue; const e=Math.abs(n/d-x); if(e<err-1e-9){err=e;best=[n,d]}}
+  const g=(a,b)=>b?g(b,a%b):a; const k=g(best[0],best[1]); return `${best[0]/k}/${best[1]/k}`;
+}
+const fair = p => p>0 ? 1/p : Infinity;
+const dec2 = d => isFinite(d) ? d.toFixed(2) : "–";
+
+// ---------- samples ----------
+const cache = new Map();
+function dec(b64){ if(!b64) return null; if(cache.has(b64)) return cache.get(b64);
+  const bin=atob(b64), u=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i);
+  const a=new Int16Array(u.buffer); cache.set(b64,a); return a; }
+
+// ---------- state: model inputs -> games, sims run here ----------
+// Kick-off times are UK times like "Sun 08 Nov 14:30"; work out the real moment, then label by the viewer's clock.
+function kickTime(str){ const m=/(\d{1,2}) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (\d{1,2}):(\d{2})/.exec(str||""); if(!m) return null;
+  const mo=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].indexOf(m[2]), yr=D.season+(mo<6?1:0);
+  const guess=Date.UTC(yr,mo,+m[1],+m[3],+m[4]); const uk=new Date(new Date(guess).toLocaleString("en-US",{timeZone:"Europe/London"})), utc=new Date(new Date(guess).toLocaleString("en-US",{timeZone:"UTC"}));
+  return guess-(uk-utc); }
+function kickStatus(str){ const t=kickTime(str); if(t===null) return ""; const now=Date.now();
+  if(now>=t+4*3600e3) return "Played · pre-game simulation · "; if(now>=t) return "Kicked off · pre-game simulation · ";
+  const d=x=>new Date(x).toLocaleDateString("en-GB",{timeZone:"Europe/London"}); return d(now)===d(t)? "Today · " : ""; }
+setTimeout(()=>{ try{ autoWeather(); }catch(e){} }, 300);
+/*__GLANCE__*/
+const M = D; let gi = 0, nSims = 50000;
+function tinfo(abbr){ const t=M.teams[abbr]; return {abbr, name:t.name, c1:t.c1, c2:t.c2}; }
+const games = M.games.map((x,i)=>({idx:i, id:x.id, home:tinfo(x.home), away:tinfo(x.away), kickoff:kickStatus(x.kickoff)+x.kickoff+" UK"+(x.week!==M.week?` · week ${x.week}`:""), started:kickTime(x.kickoff)!==null && Date.now()>=kickTime(x.kickoff), neutral:x.neutral, tonight:!!x.tonight,
+  market:{spread_home:x.spread_home, total:x.total}, lineups:x.lineups, restDiff:x.restDiff||0, homeRest:x.homeRest, awayRest:x.awayRest,
+  weather:{roof:x.roof||"outdoors", wind:"", temp:""}, oddsRaw:x.odds||{}, kickRaw:x.kickoff, geo:x.geo||null, roofKnown:!!x.roof}));
+const custom = {idx:games.length, custom:true, home:tinfo("KC"), away:tinfo("BUF"), kickoff:"Custom matchup", neutral:false, market:null, lineMode:"none", restDiff:0, weather:{roof:"outdoors", wind:"", temp:""}};
+const LOGS = {}; Object.values(M.teams).forEach(t=>t.players.forEach(p=>{ if(p.log) LOGS[p.id]={log:p.log, tdHit:p.tdHit}; }));
+M.games.forEach(x=>Object.values(x.lineups||{}).forEach(L=>L.players.forEach(p=>{ if(p.log) LOGS[p.id]={log:p.log, tdHit:p.tdHit}; })));
+// "Any matchup" removed: only this week's real games are listed
+// same simulations for a game every time (used on the betting page, so everyone sees the same picks)
+const seedFor = g => { let h=2166136261>>>0; for(const c of g.id+':'+nSims){ h^=c.charCodeAt(0); h=Math.imul(h,16777619)>>>0; } return h; };
+const newSeed = () => (Math.random()*2**31)>>>0;
+// International (neutral-site) games: since 2018 they've gone under the closing total 58% of the time (43 games),
+// by about 2.5 points on average. We take a cautious 1 point off the total; the ledger will show if that helps.
+const INTL_ADJ = 1;
+function runSim(g){
+  const t0=performance.now(), seed=(window.__FIXED && g.id)? seedFor(g) : newSeed();
+  const anchor = g.market ? [g.market.spread_home, g.market.total - (g.neutral && !g.custom ? INTL_ADJ : 0)] : null;
+  const lineups = g.lineups || null;
+  const ctx = {neutral:g.neutral, anchor, lineups, restDiff:g.restDiff||0, weather:g.weather};
+  const S = EdgeSim.simulate(M, g.home.abbr, g.away.abbr, Object.assign({n:nSims, seed}, ctx));
+  g.sim = EdgeSim.summarise(M, S, anchor); g.players = g.sim.players.slice(0, 26); g.S = S;
+  g.runMs = performance.now()-t0; g.runN = nSims; g.runId = seed.toString(36).slice(-4).toUpperCase();
+  g.ctx = ctx; g.replays = [EdgeSim.replay(M, g.home.abbr, g.away.abbr, Object.assign({seed:newSeed()}, ctx))];
+}
+$("#meta").textContent = `NFL ${M.season} · Week ${M.week} · data updated ${M.generated} UK` + (M.auto ? " · checks for new data hourly" : "");
+function team(g,abbr){return g.home.abbr===abbr?g.home:g.away}
+
+// ---------- ribbon ----------
+function renderRibbon(){
+  $("#ribbon").innerHTML = games.map((g,i)=>{
+    if(g.custom) return `<button class="chip" type="button" data-i="${i}" aria-pressed="${i===gi}"><span class="row"><strong>Any matchup</strong></span><span class="small">Pick two teams</span><span class="small mono">neutral, line or none</span></button>`;
+    return `<button class="chip" type="button" data-i="${i}" aria-pressed="${i===gi}">
+      <span class="row">${badge(g.away)}<span class="small">at</span>${badge(g.home)}</span>
+      <span class="small">${esc(g.kickoff)}${(()=>{ const v=throwVerdict(g.weather); return v&&v.level? ` · <span title="${esc(v.head)}">${v.icon}</span>` : ""; })()}</span>
+      <span class="small mono">${g.sim ? esc((g.sim.home_win>=.5?g.home:g.away).abbr)+" "+pct(Math.max(g.sim.home_win,g.sim.away_win)) : "Tap to simulate"}</span></button>`}).join("");
+  $("#ribbon").querySelectorAll(".chip").forEach(b=>b.addEventListener("click",()=>{gi=+b.dataset.i;onGame()}));
+}
+
+// ---------- matchup ----------
+function spreadText(g){ if(!g.market) return "No line"; const s=g.market.spread_home; // expected home margin
+  if(s===0) return "Pick'em"; return s>0? `${g.home.abbr} -${Math.abs(s)}` : `${g.away.abbr} -${Math.abs(s)}`; }
+function renderMatchup(){
+  const g=games[gi], s=g.sim, bg=cssVar("--sunken");
+  const tops = s.top_scores.slice(0,4).map(t=>`<span class="pill">${g.away.abbr} ${t.away}–${t.home} ${g.home.abbr} <b>${pct(t.p,1)}</b></span>`).join("");
+  const teamOpts = sel => Object.keys(M.teams).sort().map(t=>`<option value="${t}" ${t===sel?"selected":""}>${esc(M.teams[t].name)}</option>`).join("");
+  const customForm = !g.custom ? "" : `<div class="form" style="margin-bottom:16px">
+      <label for="cAway">Away team<select id="cAway">${teamOpts(g.away.abbr)}</select></label>
+      <label for="cHome">Home team<select id="cHome">${teamOpts(g.home.abbr)}</select></label>
+      <label for="cNeutral" style="flex-direction:row;align-items:center;gap:6px;padding-bottom:8px"><input type="checkbox" id="cNeutral" ${g.neutral?"checked":""}> Neutral site</label>
+      <label for="cLine">Scoring based on<select id="cLine"><option value="none" ${g.lineMode==="none"?"selected":""}>Team ratings only</option><option value="set" ${g.lineMode==="set"?"selected":""}>A betting line I enter</option></select></label>
+      ${g.lineMode==="set"?`<label for="cSpread">Home handicap<input id="cSpread" type="number" step="0.5" value="${g.market? -g.market.spread_home : -3}" style="width:90px"></label><label for="cTotal">Total<input id="cTotal" type="number" step="0.5" value="${g.market? g.market.total : 47.5}" style="width:90px"></label>`:""}
+    </div>`;
+  $("#matchup").innerHTML = customForm + `
+    <div class="cardhead" style="margin-bottom:12px"><div class="label">${esc(g.kickoff)}${g.neutral?" · neutral site":""}</div>
+      <div class="controls"><label class="small" for="nsims">Simulations</label>
+        <select id="nsims">${[1000,10000,20000,50000,100000].map(v=>`<option value="${v}" ${v===nSims?"selected":""}>${v.toLocaleString()}</option>`).join("")}</select>
+        <button class="btn primary" id="rerun" type="button">Run again</button>
+        <button class="btn" id="share" type="button">Share game</button><button class="btn" id="shareimg" type="button">Save image</button>
+        <span class="small mono" id="runinfo">${g.runN.toLocaleString()} sims in ${(g.runMs/1000).toFixed(2)} s · run ${g.runId}</span></div></div>
+    <div class="matchup">
+      <div class="teamblk">${badge(g.away,"lg")}<div><div class="nm">${esc(g.away.name)}</div><div class="pts">${fmt1(s.exp_away)}</div><div class="wp">${pct(s.away_win,1)} to win</div></div></div>
+      <div class="mid"><span class="label">${g.market?"Betting line":"Scoring from"}</span><span class="mono">${g.market? spreadText(g)+" · O/U "+g.market.total : "Team ratings only"}</span>
+        <span class="label" style="margin-top:6px">Sim range (10th–90th)</span><span class="mono">${g.away.abbr} ${s.away_pts[0]}–${s.away_pts[2]} · ${g.home.abbr} ${s.home_pts[0]}–${s.home_pts[2]}</span>
+        <span class="small" style="margin-top:6px">Overtime in ${pct(s.ot_rate,1)} of sims${s.tie_rate>0.0005?` · tie ${pct(s.tie_rate,1)}`:""}</span></div>
+      <div class="teamblk home"><div><div class="nm">${esc(g.home.name)}</div><div class="pts">${fmt1(s.exp_home)}</div><div class="wp">${pct(s.home_win,1)} to win</div></div>${badge(g.home,"lg")}</div>
+    </div>
+    <div class="winbar" aria-hidden="true"><span style="width:${s.away_win*100}%;background:${visible(g.away,bg)}"></span><span style="width:${s.home_win*100}%;background:${visible(g.home,bg)}"></span></div>
+    <div style="margin-top:12px" class="label">Most likely scores</div>
+    <div class="pills" style="margin-top:6px">${tops}</div>
+    ${contextPanel(g)}
+    ${injuryPanel(g)}
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin-top:16px">
+      <div class="small">${g.away.abbr} passing <span class="mono">${s.away_pass[1]|0}</span> yds (${s.away_pass[0]|0}–${s.away_pass[2]|0}) · rushing <span class="mono">${s.away_rush[1]|0}</span> (${s.away_rush[0]|0}–${s.away_rush[2]|0})</div>
+      <div class="small">${g.home.abbr} passing <span class="mono">${s.home_pass[1]|0}</span> yds (${s.home_pass[0]|0}–${s.home_pass[2]|0}) · rushing <span class="mono">${s.home_rush[1]|0}</span> (${s.home_rush[0]|0}–${s.home_rush[2]|0})</div>
+    </div>`;
+}
+
+function contextPanel(g){
+  const w=g.weather||{roof:"outdoors"}, indoor = w.roof==="dome"||w.roof==="closed";
+  const rest = g.custom ? `<label for="cRest">Home rest advantage (days)<input id="cRest" type="number" step="1" value="${g.restDiff||0}" style="width:80px"></label>`
+    : `<span class="small">Rest: ${esc(g.away.abbr)} ${g.awayRest??"–"} days, ${esc(g.home.abbr)} ${g.homeRest??"–"} days${g.restDiff?` (${g.restDiff>0?g.home.abbr:g.away.abbr} +${Math.abs(g.restDiff)})`:""}${g.neutral?" · neutral site: no home edge":` · home field ${g.home.abbr}`}</span>${g.neutral&&!g.custom?`<div class="small" style="margin-top:6px">🌍 International game: since 2018 these have gone under the betting total 58% of the time (43 games), by about 2.5 points on average, so the sim takes 1 point off the total (${g.market.total} → ${g.market.total-INTL_ADJ}).</div>`:""}`;
+  const wx = indoor ? `<span class="small">Indoors (${esc(w.roof)}): no weather effect</span>`
+    : (w.auto ? (()=>{ const v=throwVerdict(w); return `<div style="width:100%"><div><strong>${v.icon} ${esc(v.head)}</strong> <span class="small">${esc(v.why)}</span></div>
+        ${v.level? `<div class="small" style="margin-top:4px">In rain or strong wind, passing has averaged about 10% fewer yards per attempt and teams run more (outdoor games 2024–26). The sim has cut passing yards for this game; the betting line usually already reflects the forecast.</div>` : ""}
+        <div class="small" style="margin-top:4px">Forecast at kick-off from <a href="https://open-meteo.com" rel="noopener" target="_blank">Open-Meteo</a> (${esc(w.auto)})</div></div>`; })()
+       : `<span class="small">Outdoors: no weather adjustment</span>`);
+  return `<div class="form" style="margin-top:16px;align-items:center">${rest}${wx}</div>`;
+}
+function injuryPanel(g){
+  const side = t => { const L = (g.lineups && g.lineups[t.abbr]) || M.teams[t.abbr]; const I = L.injuries; if(!I) return "";
+    const out = I.out.map(x=>`<li><strong>${esc(x.name)}</strong> <span class="small">${esc(x.pos)} · ${esc(x.reason)}</span></li>`).join("");
+    const q = I.questionable.map(x=>`<li>${esc(x.name)} <span class="small">${esc(x.pos)} · Questionable${x.injury?" ("+esc(x.injury)+")":""} · still in</span></li>`).join("");
+    const back = I.returning.map(x=>`<li>${esc(x.name)} <span class="small">${esc(x.pos)} · active, hasn't played lately · reduced role</span></li>`).join("");
+    const qb = L.qb && L.qb.changed ? `<li><strong>${esc(L.qb.name)}</strong> <span class="small">starts at QB (team scoring follows the betting line, and a backup's passing yards are trimmed 15%)</span></li>` : "";
+    const status = I.report ? `Week ${I.week} injury report applied` : `Week ${I.week} injury report not out yet (Wed–Fri); roster moves applied`;
+    return `<div><div class="label" style="margin-bottom:6px">${badge(t)} ${esc(status)}</div><ul class="inj">${qb}${out||""}${q}${back}${(!out&&!q&&!back&&!qb)?'<li class="small">No absences affecting the simulation</li>':""}</ul></div>`; };
+  return `<div style="margin-top:16px" class="label">Availability: who's in the simulation</div>
+    <div class="grid g2" style="margin-top:8px">${side(g.away)}${side(g.home)}</div>`;
+}
+// ---------- histograms ----------
+function hist(el, counts, x0, lo, hi, marks, colorFor, xlab){
+  const W=520,H=210,L=12,R=12,T=14,B=40, n=counts.length;
+  const sel = counts.map((c,i)=>({v:x0+i,c})).filter(d=>d.v>=lo&&d.v<=hi);
+  const max = Math.max(...sel.map(d=>d.c))||1, bw=(W-L-R)/sel.length;
+  const X = v => L + (v-lo)*bw + bw/2;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(xlab)}">`;
+  // grid
+  s += `<line x1="${L}" x2="${W-R}" y1="${H-B}" y2="${H-B}" stroke="${cssVar("--line-strong")}" stroke-width="1"/>`;
+  sel.forEach(d=>{ const h=(d.c/max)*(H-T-B); s+=`<rect x="${(L+(d.v-lo)*bw+.5).toFixed(1)}" y="${(H-B-h).toFixed(1)}" width="${Math.max(bw-1,1).toFixed(1)}" height="${h.toFixed(1)}" fill="${colorFor(d.v)}"/>`; });
+  const step = (hi-lo)>60?10:10;
+  for(let v=Math.ceil(lo/step)*step; v<=hi; v+=step){ s+=`<text x="${X(v)}" y="${H-B+16}" text-anchor="middle">${v===0?"0":(xlab.startsWith("Home")?Math.abs(v):v)}</text>`; }
+  marks.forEach(m=>{ const x=X(m.v); s+=`<line x1="${x}" x2="${x}" y1="${T-4}" y2="${H-B}" stroke="${m.color}" stroke-width="2" stroke-dasharray="${m.dash?"4 3":"0"}"/>`;
+    s+=`<text x="${Math.min(Math.max(x,40),W-40)}" y="${T-2+(m.row||0)*13}" text-anchor="middle" style="fill:${m.color};font-weight:700">${esc(m.label)}</text>`; });
+  s+=`<text x="${W/2}" y="${H-6}" text-anchor="middle">${esc(xlab)}</text></svg>`;
+  el.innerHTML = s;
+}
+function renderCharts(){
+  const g=games[gi], s=g.sim, bg=cssVar("--raised"), ca=visible(g.away,bg), ch=visible(g.home,bg), ink=cssVar("--ink"), aqua=cssVar("--aqua");
+  hist($("#marginchart"), s.margin_hist, -40, -35, 35,
+       g.market?[{v:g.market.spread_home,label:`Line ${spreadText(g)}`,color:aqua,dash:true}]:[],
+       v=> v<0?ca: v>0?ch: cssVar("--line-strong"), `Home margin: ← ${g.away.abbr} win by · ${g.home.abbr} win by →`);
+  $("#marginsub").textContent = g.market ? `${(g.market.spread_home>=0?g.home:g.away).abbr} cover ${spreadText(g)} in ${pct(g.market.spread_home>=0?s.cover:1-s.cover,0)} of sims · bars show how often each final margin came up` : `${g.home.abbr} win by ${s.margin[1]} at the median · bars show how often each final margin came up`;
+  hist($("#totalchart"), s.total_hist, 0, 15, 85,
+       g.market?[{v:g.market.total,label:`Line O/U ${g.market.total}`,color:aqua,dash:true}]:[],
+       v=> cssVar("--mist"), "Total points scored");
+  $("#totalsub").textContent = g.market ? `Over ${g.market.total} in ${pct(s.over,0)} of sims · median ${s.total[1]}` : `Median ${s.total[1]} · 10th–90th ${s.total[0]}–${s.total[2]}`;
+}
+// ---------- player table ----------
+let psort = "td";
+function rangeBar(q, max){ if(!max) return ""; const l=q[0]/max*100, w=Math.max((q[2]-q[0])/max*100,1), m=q[1]/max*100;
+  return `<span class="range" aria-hidden="true"><i style="left:${l}%;width:${w}%"></i><b style="left:calc(${m}% - 1px)"></b></span>`; }
+function lastFive(p){
+  const L = LOGS[p.id]; if(!L || !L.log.length) return `<td class="small">No games yet</td><td></td><td></td>`;
+  const kind = p.passy ? "py" : (p.rush[1] >= p.rec[1] ? "ru" : "re"), med = p.passy ? p.passy[1] : (kind==="ru" ? p.rush[1] : p.rec[1]);
+  const vals = L.log.map(x=>x[kind]), beat = vals.filter(v=>v>med).length;
+  const txt = L.log.map(x=>`<span title="${esc(x.wk)} v ${esc(x.opp)}">${x[kind]}${x.td?"<b class='tdm'>•</b>":""}</span>`).join(" · ");
+  const sn = L.log[L.log.length-1].sn;
+  return `<td class="mono small">${txt} <span class="beat">${kind==="ru"?"rush":kind==="re"?"rec":"pass"} · ${beat}/${vals.length} over ${med|0}</span></td>
+    <td class="num mono">${L.tdHit[0]}/${L.tdHit[1]}</td><td class="num mono">${sn==null?"–":sn+"%"}</td>`;
+}
+function renderPlayers(){
+  const g=games[gi], ps=[...g.players];
+  const key = {td:p=>-p.td, rush:p=>-p.rush[1], rec:p=>-p.rec[1], pass:p=>-(p.passy?p.passy[1]:-1), name:p=>p.name}[psort];
+  ps.sort((a,b)=>{const x=key(a),y=key(b); return x<y?-1:x>y?1:0});
+  const mx = k => Math.max(...ps.map(p=>p[k]?p[k][2]:0));
+  const mr=mx("rush"), mc=mx("rec");
+  const th = (k,l,c="") => `<th class="${c} ${k?"sortable":""}" ${k?`data-k="${k}" aria-sort="${psort===k?"descending":"none"}" tabindex="0"`:""}>${l}${psort===k?" ↓":""}</th>`;
+  $("#ptable").innerHTML = `<thead><tr>${th("name","Player")}${th("","Team")}${th("td","TD chance","num")}${th("rush","Rush yds")}${th("rec","Rec yds")}${th("","Catches","num")}${th("","Last 5 games")}${th("","TD in last 8","num")}${th("","Snaps last game","num")}</tr></thead><tbody>` +
+    ps.map(p=>{ const t=team(g,p.team);
+      const passTxt = p.passy ? `<div class="small">${p.passy[1]|0} pass yds <span class="mono">(${p.passy[0]|0}–${p.passy[2]|0})</span></div>` : "";
+      return `<tr><td><strong>${esc(p.name)}</strong> <span class="small">${esc(p.pos)}</span>${p.q?'<span class="qtag" title="Questionable">Q</span>':""}${passTxt}</td><td>${badge(t)}</td>
+      <td class="num mono">${pct(p.td,0)}</td>
+      <td class="mono"><span class="nv">${p.rush[1]>0.5?(p.rush[1]|0):"–"}</span>${p.rush[2]>1?rangeBar(p.rush,mr)+`<div class="small">${p.rush[0]|0} – ${p.rush[2]|0}</div>`:""}</td>
+      <td class="mono"><span class="nv">${p.rec[1]>0.5?(p.rec[1]|0):"–"}</span>${p.rec[2]>1?rangeBar(p.rec,mc)+`<div class="small">${p.rec[0]|0} – ${p.rec[2]|0}</div>`:""}</td>
+      <td class="num mono">${p.recs[1]}${p.recs[2]>0?`<div class="small">${p.recs[0]} – ${p.recs[2]}</div>`:""}</td>${lastFive(p)}</tr>`}).join("") + "</tbody>";
+  $("#ptable").querySelectorAll("th.sortable").forEach(h=>{ const go=()=>{psort=h.dataset.k;renderPlayers()}; h.addEventListener("click",go); h.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}}); });
+}
+
+// ---------- field replay ----------
+const FIELD = {grass:"#0d3523", stripe:"#10402a", line:"rgba(255,255,255,.55)", text:"rgba(255,255,255,.75)"};
+let rep = {k:0, d:-1, playing:false, raf:0, anim:null};
+function fieldColor(t){ if(contrast(t.c1,FIELD.grass)>=2.2) return t.c1; if(t.c2&&contrast(t.c2,FIELD.grass)>=2.2) return t.c2; return "#f5f8f9"; }
+function xOf(g, team, y){ return team===g.home.abbr ? 100+10*y : 1100-10*y; }
+function drawField(g, drive, ballY, done, pl, frac){
+  const narrow = ($("#field").clientWidth||1200) < 640, VW = narrow ? 600 : 1200;
+  const ballX = drive ? xOf(g, drive.team, Math.max(-9, Math.min(109, ballY))) : 600, VX = narrow ? Math.max(0, Math.min(1200-VW, ballX-VW/2)) : 0, CX = VX + VW/2;
+  $("#field").setAttribute("viewBox", `${VX} 0 ${VW} 300`);
+  const H=g.home, A=g.away, F="Archivo, Arial, sans-serif", U="Unbounded, Arial Black, sans-serif", MONO="JetBrains Mono, monospace";
+  let s = `<defs>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity=".22"/><stop offset=".5" stop-color="#fff" stop-opacity=".05"/><stop offset="1" stop-color="#000" stop-opacity=".25"/></linearGradient>
+    <pattern id="ezStripe" width="18" height="18" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><rect width="9" height="18" fill="#fff" fill-opacity=".07"/></pattern>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#000" flood-opacity=".45"/></filter>
+  </defs>`;
+  // grass: 5-yard mowing stripes, a soft sheen, sidelines
+  for(let i=0;i<20;i++) s+=`<rect x="${100+i*50}" y="0" width="50" height="300" fill="${i%2?"#145a37":"#11502f"}"/>`;
+  s+=`<rect x="100" y="0" width="1000" height="300" fill="url(#sheen)"/>`;
+  // end zones in team colours, with stripes, names and goalposts
+  for(const [T,x0,rot] of [[H,0,-90],[A,1100,90]]){
+    s+=`<rect x="${x0}" y="0" width="100" height="300" fill="${T.c1}"/><rect x="${x0}" y="0" width="100" height="300" fill="url(#ezStripe)"/>`;
+    s+=`<text x="${x0+50}" y="150" fill="${textOn(T.c1)}" font-family="${U}" font-weight="800" font-size="40" letter-spacing="4" text-anchor="middle" dominant-baseline="middle" transform="rotate(${rot} ${x0+50} 150)">${esc(T.abbr)}</text>`;
+    const gx = x0===0 ? 6 : 1194; s+=`<line x1="${gx}" x2="${gx}" y1="128" y2="172" stroke="#f7d64a" stroke-width="5" stroke-linecap="round"/><circle cx="${gx}" cy="150" r="4" fill="#f7d64a"/>`;
+  }
+  s+=`<rect x="1" y="1" width="1198" height="298" fill="none" stroke="#fff" stroke-opacity=".85" stroke-width="3"/>`;
+  for(let y=5;y<100;y+=5){ const x=100+y*10; s+=`<line x1="${x}" x2="${x}" y1="0" y2="300" stroke="#fff" stroke-opacity="${y%10?.35:.6}" stroke-width="${y%10?1:2}"/>`; }
+  s+=`<line x1="100" x2="100" y1="0" y2="300" stroke="#fff" stroke-width="5"/><line x1="1100" x2="1100" y1="0" y2="300" stroke="#fff" stroke-width="5"/>`;
+  for(let y=10;y<100;y+=10){ const lab=y<=50?y:100-y, x=100+y*10, arrow = y<50? "◂" : y>50? "▸" : "";
+    for(const yy of [42,272]) s+=`<text x="${x}" y="${yy}" fill="#fff" fill-opacity=".8" font-family="${MONO}" font-weight="700" font-size="22" text-anchor="middle">${y<50?`<tspan font-size="12" dx="-2">${arrow}</tspan>`:""}${lab}${y>50?`<tspan font-size="12" dx="2">${arrow}</tspan>`:""}</text>`; }
+  for(let y=1;y<100;y++){ const x=100+y*10; s+=`<line x1="${x}" x2="${x}" y1="96" y2="104" stroke="#fff" stroke-opacity=".45"/><line x1="${x}" x2="${x}" y1="196" y2="204" stroke="#fff" stroke-opacity=".45"/>`; }
+  if(drive){
+    const t=team(g,drive.team), col=fieldColor(t), X=y=>xOf(g,drive.team,Math.max(-9,Math.min(109,y)));
+    const live = pl && !done && pl.kind!=="punt" && pl.kind!=="fg";
+    // line of scrimmage (blue) and the line to gain (yellow), as on TV
+    if(live){ const xl=X(pl.yl);
+      s+=`<line x1="${xl}" x2="${xl}" y1="0" y2="300" stroke="#4fb3ff" stroke-width="12" opacity=".25"/><line x1="${xl}" x2="${xl}" y1="0" y2="300" stroke="#4fb3ff" stroke-width="4"/>`;
+      if(pl.yl+pl.togo<100){ const xf=X(pl.yl+pl.togo); s+=`<line x1="${xf}" x2="${xf}" y1="0" y2="300" stroke="#f7d64a" stroke-width="12" opacity=".25"/><line x1="${xf}" x2="${xf}" y1="0" y2="300" stroke="#f7d64a" stroke-width="4"/>`; } }
+    // drive chart: every play so far, stacked like a broadcast drive chart
+    const shown = done ? drive.pbp : drive.pbp.slice(0, Math.max(0, drive.pbp.indexOf(pl)));
+    const n = Math.max(shown.length,1), top=112, span=76, step=Math.min(12, span/n);
+    shown.forEach((p,i)=>{ const y=top+i*step, xa=X(p.yl), kind=p.kind;
+      if(kind==="punt"||kind==="fg") return;
+      const xb = kind==="inc" ? X(p.yl+8) : X(p.yl+p.gain), c = kind==="sack"? "#ff6b6b" : kind==="turnover"? "#ffa94d" : col;
+      if(kind==="pass"||kind==="inc"||(kind==="td"&&/pass/i.test(p.text))){ const mx=(xa+xb)/2, lift=Math.min(28, 8+Math.abs(xb-xa)*.12);
+        s+=`<path d="M${xa} ${y} Q${mx} ${y-lift} ${xb} ${y}" fill="none" stroke="${c}" stroke-width="3" ${kind==="inc"?'stroke-dasharray="5 5" opacity=".7"':""} stroke-linecap="round"/>`;
+        if(kind==="inc") s+=`<text x="${xb}" y="${y+4}" fill="#fff" fill-opacity=".8" font-size="12" font-family="${F}" font-weight="700" text-anchor="middle">✕</text>`; }
+      else s+=`<line x1="${xa}" x2="${xb}" y1="${y}" y2="${y}" stroke="${c}" stroke-width="4" stroke-linecap="round"/>`;
+      if(kind!=="inc") s+=`<circle cx="${xb}" cy="${y}" r="3.5" fill="#fff"/>`;
+      if(kind==="turnover") s+=`<text x="${xb}" y="${y-8}" fill="#ffa94d" font-size="11" font-family="${F}" font-weight="800" text-anchor="middle">TURNOVER</text>`; });
+    // the ball: runs slide along the ground; passes, punts and kicks fly in an arc
+    let bx=X(ballY), by=150;
+    if(pl && !done && frac!=null){
+      const passing = pl.kind==="pass"||pl.kind==="inc"||(pl.kind==="td"&&pl.passer)||(pl.kind==="turnover"&&pl.passer)||pl.kind==="downs";
+      let from=pl.yl, to=null, h=0;
+      if(passing){ to = pl.kind==="inc"||pl.kind==="downs" ? Math.min(pl.yl+12,100) : pl.kind==="turnover" ? Math.min(pl.yl+14,100) : pl.yl+pl.gain; h = 26+Math.min(60, Math.abs(to-from)*1.4); }
+      else if(pl.kind==="punt"){ to = Math.min(pl.yl+42, 100); h = 95; }
+      else if(pl.kind==="fg"){ from = pl.yl-7; to = 110; h = 70; }
+      if(to!==null){ const e=Math.min(1,frac); bx = X(from+(to-from)*e); by = 150-h*Math.sin(Math.PI*e);
+        s+=`<ellipse cx="${bx}" cy="150" rx="${14-6*Math.sin(Math.PI*e)}" ry="5" fill="#000" opacity="${.35-.2*Math.sin(Math.PI*e)}"/>`; }
+    }
+    const x1=bx;
+    s+=`<g transform="translate(${x1} ${by})" filter="url(#shadow)"><ellipse rx="17" ry="10" fill="#8a4b22" stroke="#3b1d0b" stroke-width="2"/><line x1="-7" x2="7" y1="0" y2="0" stroke="#fff" stroke-width="2"/><line x1="-4" x2="-4" y1="-3" y2="3" stroke="#fff" stroke-width="1.5"/><line x1="0" x2="0" y1="-3" y2="3" stroke="#fff" stroke-width="1.5"/><line x1="4" x2="4" y1="-3" y2="3" stroke="#fff" stroke-width="1.5"/></g>`;
+    // down-and-distance pill in the possession team's colour
+    const ord = d => ["1st","2nd","3rd","4th"][d-1]||"";
+    const dd = live ? `${ord(pl.down)} & ${pl.yl+pl.togo>=100?"Goal":pl.togo}` : pl && pl.kind==="punt" ? "Punt" : pl && pl.kind==="fg" ? "Field goal try" : `${drive.plays} plays · ${drive.yards} yds`;
+    const where = live ? g.replays[rep.k].spot(t.abbr, pl.yl) : "";
+    const label = `${t.abbr} ball${where? " · "+where:""}`, w = Math.max(250, 15*(label.length+dd.length)*0.62+60);
+    s+=`<g filter="url(#shadow)"><rect x="${CX-w/2}" y="58" width="${w}" height="34" rx="17" fill="rgba(4,14,25,.88)"/><rect x="${CX-w/2}" y="58" width="12" height="34" rx="6" fill="${t.c1}"/>
+      <text x="${CX-w/2+24}" y="80" fill="#fff" font-family="${F}" font-weight="700" font-size="15">${esc(label)}</text>
+      <text x="${CX+w/2-16}" y="80" fill="#f7d64a" font-family="${MONO}" font-weight="700" font-size="15" text-anchor="end">${esc(dd)}</text></g>`;
+    if(done){ const R=drive.result, big = R==="TD"?"TOUCHDOWN":R==="FG"?"FIELD GOAL":R==="Missed FG"?"NO GOOD":R==="Turnover"?"TURNOVER":R==="Downs"?"TURNOVER ON DOWNS":R.toUpperCase();
+      const scoring = R==="TD"||R==="FG", bg = scoring ? t.c1 : "rgba(4,14,25,.9)", fg = scoring ? textOn(t.c1) : (R==="Turnover"||R==="Downs"?"#ffa94d":"#f5f8f9");
+      const bw = Math.min(600, VW-40);
+      s+=`<g filter="url(#shadow)"><rect x="${CX-bw/2}" y="196" width="${bw}" height="64" rx="12" fill="${bg}"/>${scoring?`<rect x="${CX-bw/2}" y="196" width="${bw}" height="64" rx="12" fill="url(#ezStripe)"/>`:""}
+        <text x="${CX}" y="225" fill="${fg}" font-family="${U}" font-weight="800" font-size="${R==="TD"?24:20}" letter-spacing="2" text-anchor="middle">${R==="TD"?"🏈 ":""}${esc(big)}</text>
+        <text x="${CX}" y="248" fill="${scoring?fg:"#cfe0e6"}" fill-opacity=".9" font-family="${F}" font-size="15" text-anchor="middle">${esc(drive.text)}</text></g>`; }
+  } else {
+    s+=`<g filter="url(#shadow)"><rect x="${CX-220}" y="120" width="440" height="60" rx="12" fill="rgba(4,14,25,.88)"/><text x="${CX}" y="157" fill="#f5f8f9" font-family="${F}" font-weight="700" font-size="20" text-anchor="middle">Press Play to watch a simulated game</text></g>`;
+  }
+  $("#field").innerHTML = s;
+}
+function scorebug(g, d){
+  const r=g.replays[rep.k], dr = d>=0 ? r.drives[d] : null;
+  const a = dr? dr.away:0, h = dr? dr.home:0, final = d===r.drives.length-1;
+  const lp = dr && dr.pbp && dr.pbp.length ? dr.pbp[dr.pbp.length-1] : null;
+  const q = !dr ? "Kick-off" : final ? (r.overtime ? (r.tie ? "Final · tie after OT" : "Final · OT") : "Final") : (lp ? `${lp.q>=5?"OT":"Q"+lp.q} ${lp.clock}` : (dr.q>=5 ? "OT" : `Q${dr.q}`));
+  const blk=(T,v)=>`<span class="sbt" data-t="${esc(T.abbr)}" style="background:${T.c1};color:${textOn(T.c1)}"><span class="pos" title="Has the ball">▸</span><b>${esc(T.abbr)}</b><span class="pts">${v}</span></span>`;
+  $("#sbscore").innerHTML = `<span class="sbbug">${blk(g.away,a)}${blk(g.home,h)}<span class="q">${q}</span></span>`;
+}
+function logRow(g, dr){
+  const t=team(g,dr.team), sc=dr.result==="TD"||dr.result==="FG";
+  const note = dr.note ? `<li class="note"><span class="small">${esc(dr.note)}</span></li>` : "";
+  const icon = {TD:"🏈",FG:"🎯","Missed FG":"✕",Turnover:"↺",Downs:"↺",Punt:"↷"}[dr.result]||"";
+  const toX = y => (dr.team===g.home.abbr? y : 100-y), a0=toX(dr.start), a1=toX(Math.max(0,Math.min(100,dr.end))), lo=Math.min(a0,a1), hi=Math.max(a0,a1);
+  const chart = `<span class="dchart" title="Drive: own ${dr.start} to ${dr.end>=100?"end zone":dr.end}"><span style="left:${lo}%;width:${Math.max(hi-lo,1.5)}%;background:${fieldColor(t)}"></span></span>`;
+  return `<li class="${sc?"score":""}"><span class="q">${dr.q>=5?"OT":"Q"+dr.q}</span>${badge(t)}<span><span class="res-${dr.result}">${icon} ${esc(dr.text)}</span> <span class="small">· ${dr.plays} plays, ${dr.yards} yds</span></span>${chart}<span class="sc">${g.away.abbr} ${dr.away}–${dr.home} ${g.home.abbr}</span></li>` + note;
+}
+function drawWP(g, dIdx, pIdx){
+  const r=g.replays[rep.k]; if(!r || !r.wp) return;
+  const narrow = ($("#wpsvg").clientWidth||1200) < 700, W = narrow ? 620 : 1200;
+  $("#wpsvg").setAttribute("viewBox", `0 0 ${W} 330`);
+  const L=r.length, x0=56, x1=W-24, top=18, H1=180, base=top+H1, mAxis=272, mH=48, bg=cssVar("--raised");
+  const ch=visible(g.home,bg), ca=visible(g.away,bg);
+  const X=t=> x0 + t/L*(x1-x0), Y=w=> top + (1-w)*H1;
+  const pts = r.wp.filter(pt => pt.d < dIdx || (pt.d===dIdx && pt.p<=pIdx));
+  let s = `<defs><clipPath id="wpTop"><rect x="0" y="0" width="${W}" height="${Y(0.5)}"/></clipPath><clipPath id="wpBot"><rect x="0" y="${Y(0.5)}" width="${W}" height="${H1}"/></clipPath></defs>`;
+  [0.25,0.5,0.75].forEach(v=>{ s+=`<line x1="${x0}" x2="${x1}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)" stroke-width="${v===0.5?1.5:1}" ${v===0.5?"":'stroke-dasharray="4 4"'}/>`; });
+  s+=`<text x="${x0-8}" y="${Y(1)+12}" text-anchor="end" font-size="13" fill="var(--muted)" font-family="JetBrains Mono, monospace">${esc(g.home.abbr)}</text>`;
+  s+=`<text x="${x0-8}" y="${Y(0.5)+4}" text-anchor="end" font-size="12" fill="var(--muted)" font-family="JetBrains Mono, monospace">50%</text>`;
+  s+=`<text x="${x0-8}" y="${Y(0)-4}" text-anchor="end" font-size="13" fill="var(--muted)" font-family="JetBrains Mono, monospace">${esc(g.away.abbr)}</text>`;
+  const qs=[0,900,1800,2700,3600].concat(L>3600?[4200]:[]);
+  qs.forEach((t,i)=>{ s+=`<line x1="${X(t)}" x2="${X(t)}" y1="${top}" y2="${mAxis+mH}" stroke="var(--line)" stroke-width="1"/>`;
+    if(i<qs.length-1) s+=`<text x="${(X(t)+X(qs[i+1]))/2}" y="${base+18}" text-anchor="middle" font-size="12" fill="var(--muted)" font-family="Archivo, Arial, sans-serif">${t>=3600?"OT":"Q"+(i+1)}</text>`; });
+  if(pts.length>1){
+    const line = pts.map((p,i)=>`${i?"L":"M"}${X(p.t).toFixed(1)} ${Y(p.wp).toFixed(1)}`).join(" ");
+    const area = `${line} L${X(pts[pts.length-1].t).toFixed(1)} ${Y(0.5)} L${X(pts[0].t).toFixed(1)} ${Y(0.5)} Z`;
+    s+=`<path d="${area}" fill="${ch}" fill-opacity=".28" clip-path="url(#wpTop)"/><path d="${area}" fill="${ca}" fill-opacity=".28" clip-path="url(#wpBot)"/>`;
+    s+=`<path d="${line}" fill="none" stroke="${ch}" stroke-width="2.6" stroke-linejoin="round" clip-path="url(#wpTop)"/><path d="${line}" fill="none" stroke="${ca}" stroke-width="2.6" stroke-linejoin="round" clip-path="url(#wpBot)"/>`;
+    if(!narrow) bigPlays(g, dIdx, pIdx, 3).forEach(x=>{ const pt=r.wp.find(w=>w.d===x.d&&w.p===x.p); if(!pt) return; const up=x.sw>=0;
+      const who = x.pl.kind==="td" ? `${surname(x.pl.to||x.pl.by||"")} TD` : x.pl.kind==="turnover" ? "Turnover" : x.pl.kind==="fg" ? "Field goal" : `${surname(x.pl.to||x.pl.by||x.pl.passer||"")} ${x.pl.gain} yds`;
+      const lab=`${who} ${up?"+":"−"}${Math.round(Math.abs(x.sw)*100)}%`, tx=Math.min(Math.max(X(pt.t),x0+60),x1-60), ty=Y(pt.wp)+(up?-14:22);
+      s+=`<line x1="${X(pt.t)}" x2="${X(pt.t)}" y1="${Y(pt.wp)}" y2="${ty+(up?4:-14)}" stroke="var(--muted)" stroke-width="1"/><text x="${tx}" y="${ty}" text-anchor="middle" font-size="11" font-weight="700" fill="var(--ink)" font-family="Archivo, Arial, sans-serif">${esc(lab)}</text>`; });
+  }
+  // scoring markers
+  const labelled = new Set(narrow? [] : bigPlays(g, dIdx, pIdx, 3).map(x=>x.d+"|"+x.p));
+  r.drives.forEach((d,di)=>{ const done = di<dIdx || (di===dIdx && pIdx>=d.pbp.length-1); if(!done || !(d.result==="TD"||d.result==="FG") || !d.pbp.length) return;
+    const lp=d.pbp[d.pbp.length-1], col = d.team===g.home.abbr? ch: ca, up = d.team===g.home.abbr;
+    s+=`<circle cx="${X(lp.t)}" cy="${Y(lp.wp)}" r="5" fill="${col}" stroke="var(--raised)" stroke-width="2"/>`;
+    if(!narrow && !labelled.has(di+"|"+(d.pbp.length-1))) s+=`<text x="${X(lp.t)}" y="${Y(lp.wp)+(up?-10:18)}" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)" font-family="Archivo, Arial, sans-serif">${esc(d.team)} ${d.result}</text>`; });
+  // momentum bars: win-probability swing of each finished drive
+  s+=`<line x1="${x0}" x2="${x1}" y1="${mAxis}" y2="${mAxis}" stroke="var(--line-strong)" stroke-width="1"/>`;
+  s+=`<text x="${x0-8}" y="${mAxis+4}" text-anchor="end" font-size="11" fill="var(--muted)" font-family="Archivo, Arial, sans-serif">Swing</text>`;
+  r.drives.forEach((d,di)=>{ const done = di<dIdx || (di===dIdx && pIdx>=d.pbp.length-1); if(!done || !d.pbp.length) return;
+    const tA=d.pbp[0].t-(d.pbp.length>1? (d.pbp[1].t-d.pbp[0].t):20), tB=d.pbp[d.pbp.length-1].t, sw=d.swing||0, hgt=Math.min(mH, Math.abs(sw)*mH*2.2);
+    const col = sw>=0? ch: ca, y = sw>=0? mAxis-hgt : mAxis;
+    s+=`<rect x="${X(tA)+1}" y="${y}" width="${Math.max(2,X(tB)-X(tA)-2)}" height="${Math.max(1,hgt)}" fill="${col}" fill-opacity=".8" rx="2"><title>${esc(d.team)} drive: ${esc(d.text)} (${sw>=0?"+":""}${Math.round(sw*100)} pts for ${esc(g.home.abbr)})</title></rect>`; });
+  const last = pts[pts.length-1] || r.wp[0];
+  if(last){ s+=`<circle cx="${X(last.t)}" cy="${Y(last.wp)}" r="6" fill="var(--aqua)" stroke="var(--raised)" stroke-width="2"/>`;
+    const lead = last.wp>=0.5? g.home : g.away, v = last.wp>=0.5? last.wp : 1-last.wp;
+    $("#wpnow").textContent = `${lead.abbr} ${Math.round(v*100)}% to win`; }
+  $("#wpsvg").innerHTML = s;
+}
+function jumpTo(dIdx, pIdx){
+  const g=games[gi], r=g.replays[rep.k], dr=r.drives[dIdx]; if(!dr) return; const pl=dr.pbp[pIdx]; if(!pl) return;
+  cancelAnimationFrame(rep.raf); rep.anim=null; rep.playing=false; $("#play").textContent="Play";
+  $("#log").innerHTML = r.drives.slice(0,dIdx).map(d=>logRow(g,d)).reverse().join("");
+  scorebug(g, dIdx-1); setTicker(g, pl); drawWP(g, dIdx, pIdx); drawField(g, dr, pl.yl, false, pl, 0); renderLeaders(g, dIdx, pIdx-1);
+  rep.d = dIdx-1;   // Play carries on from the start of this drive
+}
+$("#wpsvg").addEventListener("click", ev=>{
+  const g=games[gi], r=g.replays[rep.k]; if(!r||!r.wp||!r.wp.length) return; const box=$("#wpsvg").getBoundingClientRect();
+  const vb=$("#wpsvg").viewBox.baseVal, xs=(ev.clientX-box.left)/box.width*vb.width, x0=56, x1=vb.width-24, tt=Math.max(0,Math.min(1,(xs-x0)/(x1-x0)))*r.length;
+  let best=null; for(const w of r.wp){ if(w.d<0) continue; if(!best || Math.abs(w.t-tt)<Math.abs(best.t-tt)) best=w; } if(best) jumpTo(best.d, best.p);
+});
+function setTicker(g, pl){
+  if(!pl){ $("#ticker").innerHTML = `<span class="cl">Kick-off</span>`; return; }
+  const ord = d => ["1st","2nd","3rd","4th"][d-1]||"", r=g.replays[rep.k];
+  const dd = pl.kind==="punt" ? "Punt" : pl.kind==="fg" ? "FG try" : `${ord(pl.down)} & ${pl.yl+pl.togo>=100?"goal":pl.togo}`;
+  const qEl=document.querySelector("#sbscore .q"); if(qEl) qEl.textContent = `${pl.q>=5?"OT":"Q"+pl.q} ${pl.clock}`;
+  document.querySelectorAll("#sbscore .sbt").forEach(el=>el.classList.toggle("has", el.dataset.t===pl.team));
+  $("#ticker").innerHTML = `<span class="cl">${pl.q>=5?"OT":"Q"+pl.q} ${esc(pl.clock)}</span><span class="dd">${esc(dd)} · ${esc(r.spot(pl.team, pl.yl))}</span><span>${esc(pl.text)}</span>`;
+}
+function boxStats(g, dIdx, pIdx){
+  const r=g.replays[rep.k], S={}; const T=t=>S[t]||(S[t]={pass:{},rush:{},rec:{}});
+  r.drives.forEach((d,di)=>{ if(di>dIdx) return; d.pbp.forEach((p,pi)=>{ if(di===dIdx && pi>pIdx) return; const X=T(p.team);
+    if(p.passer && ["pass","inc","td","turnover","downs"].includes(p.kind)){ const q=X.pass[p.passer]||(X.pass[p.passer]={c:0,a:0,y:0,td:0,int:0}); q.a++;
+      if(p.kind==="pass"||p.kind==="td"){ q.c++; q.y+=p.gain; if(p.kind==="td") q.td++; } if(p.kind==="turnover") q.int++;
+      if(p.to && (p.kind==="pass"||p.kind==="td")){ const w=X.rec[p.to]||(X.rec[p.to]={n:0,y:0,td:0}); w.n++; w.y+=p.gain; if(p.kind==="td") w.td++; } }
+    else if(p.by && (p.kind==="run"||p.kind==="td")){ const w=X.rush[p.by]||(X.rush[p.by]={n:0,y:0,td:0}); w.n++; w.y+=p.gain; if(p.kind==="td") w.td++; } }); });
+  return S;
+}
+const surname = n => { const p=String(n).split(" "); return p.length>1 && /^(Jr\.?|Sr\.?|II|III|IV)$/.test(p[p.length-1]) ? p[p.length-2] : p[p.length-1]; };
+function bigPlays(g, dIdx, pIdx, k){
+  const r=g.replays[rep.k], out=[]; let prev=r.wp[0]? r.wp[0].wp : .5;
+  r.drives.forEach((d,di)=>{ if(di>dIdx) return; d.pbp.forEach((p,pi)=>{ if(di===dIdx && pi>pIdx) return; if(p.wp==null) return;
+    if(p.kind!=="punt") out.push({d:di,p:pi,pl:p,sw:p.wp-prev}); prev=p.wp; }); });
+  return out.sort((a,b)=>Math.abs(b.sw)-Math.abs(a.sw)).slice(0,k);
+}
+function renderLeaders(g, dIdx, pIdx, final){
+  const el=$("#leaders"); if(!el) return; if(dIdx<0){ el.innerHTML=""; return; }
+  const S=boxStats(g,dIdx,pIdx), top=(o,f)=>Object.entries(o).filter(([n])=>n && n!=="a teammate").sort((a,b)=>f(b[1])-f(a[1]));
+  const line=(T)=>{ const X=S[T.abbr]||{pass:{},rush:{},rec:{}}, P=top(X.pass,v=>v.y)[0], R=top(X.rush,v=>v.y)[0], C=top(X.rec,v=>v.y)[0];
+    return `<div class="ldr">${badge(T)}<span>${P?`<b>${esc(surname(P[0]))}</b> ${P[1].y} yds${P[1].td?`, ${P[1].td} TD`:""}`:"–"}</span><span>${R?`<b>${esc(surname(R[0]))}</b> ${R[1].n}-${R[1].y}${R[1].td?`, ${R[1].td} TD`:""}`:"–"}</span><span>${C?`<b>${esc(surname(C[0]))}</b> ${C[1].n}-${C[1].y}${C[1].td?`, ${C[1].td} TD`:""}`:"–"}</span></div>`; };
+  if(!final){ el.innerHTML=`<div class="ldr head"><span></span><span>Passing</span><span>Rushing</span><span>Receiving</span></div>${line(g.away)}${line(g.home)}`; return; }
+  const box=(T)=>{ const X=S[T.abbr]||{pass:{},rush:{},rec:{}};
+    const rows=[...top(X.pass,v=>v.y).slice(0,1).map(([n,v])=>`<tr><td>${esc(n)}</td><td class="mono">${v.y} passing yds${v.td?`, ${v.td} TD`:""}${v.int?`, ${v.int} INT`:""}</td></tr>`),
+      ...top(X.rush,v=>v.y).slice(0,2).map(([n,v])=>`<tr><td>${esc(n)}</td><td class="mono">${v.n} carries, ${v.y} yds${v.td?`, ${v.td} TD`:""}</td></tr>`),
+      ...top(X.rec,v=>v.y).slice(0,3).map(([n,v])=>`<tr><td>${esc(n)}</td><td class="mono">${v.n} catches, ${v.y} yds${v.td?`, ${v.td} TD`:""}</td></tr>`)].join("");
+    return `<div class="boxteam"><div class="boxhead">${badge(T)} <b>${esc(T.name)}</b></div><table class="boxt">${rows}</table></div>`; };
+  const bp=bigPlays(g,dIdx,pIdx,3).map(x=>{ const T=team(g,x.pl.team); return `<li>${badge(T)} <span>${esc(x.pl.text)}</span> <span class="mono small">${x.sw>=0?"+":"−"}${Math.round(Math.abs(x.sw)*100)}% ${esc(g.home.abbr)}</span></li>`; }).join("");
+  el.innerHTML=`<div class="boxwrap"><div class="label" style="margin-bottom:6px">Full-time box score</div><div class="boxgrid">${box(g.away)}${box(g.home)}</div>
+    <div class="label" style="margin:10px 0 6px">Biggest plays</div><ol class="bigplays">${bp}</ol></div>`;
+}
+function resetReplay(){
+  cancelAnimationFrame(rep.raf); rep.d=-1; rep.playing=false; rep.anim=null; $("#play").textContent="Play";
+  const g=games[gi]; $("#log").innerHTML=""; drawField(g,null); scorebug(g,-1); setTicker(g,null); drawWP(g,-1,0); renderLeaders(g,-1,0);
+}
+function finishDrive(){
+  const g=games[gi], r=g.replays[rep.k], dr=r.drives[rep.d];
+  drawField(g, dr, dr.end, true); scorebug(g, rep.d);
+  if(dr.pbp && dr.pbp.length) setTicker(g, dr.pbp[dr.pbp.length-1]); drawWP(g, rep.d, (dr.pbp||[]).length-1);
+  $("#log").insertAdjacentHTML("afterbegin", logRow(g,dr));
+  rep.anim=null;
+  renderLeaders(g, rep.d, (dr.pbp||[]).length-1, rep.d===r.drives.length-1);
+  if(rep.d===r.drives.length-1){ rep.playing=false; $("#play").textContent="Replay"; return; }
+  if(rep.playing){ setTimeout(()=>{ if(rep.playing) startDrive(); }, (dr.result==="TD"||dr.result==="FG"?1100:650)/speed()); }
+}
+function speed(){ return parseFloat($("#speed").value)||1; }
+function startDrive(){
+  const g=games[gi], r=g.replays[rep.k];
+  if(rep.d>=r.drives.length-1) return;
+  rep.d++; const dr=r.drives[rep.d];
+  if(reduce){ finishDrive(); return; }
+  // animate the drive's actual plays: each snap moves the ball from the line of scrimmage by that play's gain
+  const pbp = dr.pbp && dr.pbp.length ? dr.pbp : [{yl:dr.start, gain:dr.yards, down:1, togo:10, kind:"run", text:dr.text, team:dr.team, q:dr.q, clock:""}];
+  const n=pbp.length, marks=[pbp[0].yl].concat(pbp.map(p=>Math.min(100, p.yl+p.gain)));
+  rep.anim={marks, i:-1, t0:performance.now()};
+  const per = 650/speed();
+  const tick = now => {
+    if(!rep.anim) return;
+    const a=rep.anim, el=Math.max(0,(now-a.t0)/per), i=Math.floor(el);
+    if(i>=n){ finishDrive(); return; }
+    if(i!==a.i){ a.i=i; setTicker(g, pbp[i]); if(i>0) drawWP(g, rep.d, i-1); renderLeaders(g, rep.d, i-1); }
+    const f=Math.min(1,(el-i)*1.6), e=1-Math.pow(1-f,3), y=a.marks[i]+(a.marks[i+1]-a.marks[i])*e;
+    drawField(g, dr, y, false, pbp[i], f); rep.raf=requestAnimationFrame(tick);
+  };
+  rep.raf=requestAnimationFrame(tick);
+}
+$("#play").addEventListener("click",()=>{
+  const g=games[gi], r=g.replays[rep.k];
+  if(rep.d===r.drives.length-1){ resetReplay(); }
+  rep.playing=!rep.playing; $("#play").textContent=rep.playing?"Pause":"Play";
+  if(rep.playing && !rep.anim) startDrive();
+});
+$("#step").addEventListener("click",()=>{ rep.playing=false; $("#play").textContent="Play"; if(rep.anim){cancelAnimationFrame(rep.raf); finishDrive();} else startDrive(); });
+$("#typgame").addEventListener("click",()=>{
+  const g=games[gi], ty=g.typ; if(!ty) return; const btn=$("#typgame"); if(btn.disabled) return; btn.disabled=true; btn.textContent="Finding it…";
+  const want=[g.away.abbr,g.home.abbr], names=new Set(want.flatMap(t=>ty[t].scorers)); let best=null, bestScore=1e9, tries=0;
+  const score = r => { const d = Math.abs(r.final[want[0]]-ty[want[0]].pts) + Math.abs(r.final[want[1]]-ty[want[1]].pts);
+    const sc = r.drives.filter(x=>x.result==="TD").map(x=>x.scorer), hit = sc.filter(n=>names.has(n)).length; return d*3 + (names.size-Math.min(hit,names.size)) + (r.overtime? 6 : 0); };   // a typical game shouldn't need overtime
+  const step = () => { for(let k=0;k<6;k++){ const r=EdgeSim.replay(M, g.home.abbr, g.away.abbr, Object.assign({seed:9000+tries*7919}, g.ctx||{})); tries++;
+      const s=score(r); if(s<bestScore){ bestScore=s; best=r; } if(bestScore===0) break; }
+    if(bestScore>0 && tries<120) { setTimeout(step, 0); return; }
+    g.replays=[best]; rep.k=0; resetReplay(); btn.disabled=false; btn.textContent="Watch the typical game";
+    rep.playing=true; $("#play").textContent="Pause"; startDrive(); };
+  setTimeout(step, 20);
+});
+$("#resim").addEventListener("click",()=>{ const g=games[gi]; g.replays=[EdgeSim.replay(M, g.home.abbr, g.away.abbr, Object.assign({seed:newSeed()}, g.ctx||{}))]; rep.k=0; resetReplay(); });
+
+// ---------- model kv ----------
+$("#modelkv").innerHTML = `<dt>Scheduled games</dt><dd>${games.length-1}</dd><dt>Teams rated</dt><dd>${Object.keys(M.teams).length}</dd><dt>Data through</dt><dd>${esc(M.dataThrough)}</dd><dt>Model</dt><dd>${esc(M.model)}</dd><dt>Updated</dt><dd>${esc(M.generated)}</dd><dt>Where it runs</dt><dd>In this page, on your device</dd>`;
+
+/*__PICKS_JS__*/
+// ---------- routing ----------
+const VIEWS=["games","model"].concat(document.getElementById("v-picks")?["picks"]:[]).concat(document.getElementById("v-fantasy")?["fantasy"]:[]).concat(document.getElementById("v-playoffs")?["playoffs"]:[]);
+function gameSlug(g){ return "g-"+g.away.abbr.toLowerCase()+"-"+g.home.abbr.toLowerCase(); }
+function route(){
+  const hs = location.hash.slice(1);
+  if(hs.startsWith("g-")){ const k=games.findIndex(g=>!g.custom && gameSlug(g)===hs); if(k>=0 && k!==gi){ gi=k; if(typeof onGame==="function" && games[0].home) setTimeout(()=>{ onGame(); const m=$("#matchup"); if(m) m.scrollIntoView({behavior:"smooth"}); },0); } }
+  const v = VIEWS.includes(hs) ? hs : "games";
+  VIEWS.forEach(x=>{ $("#v-"+x).hidden = x!==v; });
+  document.querySelectorAll("nav.tabs a").forEach(a=>a.setAttribute("aria-current", a.dataset.view===v?"page":"false"));
+  $("#ribbon").hidden = (v==="model");
+}
+window.addEventListener("hashchange",route);
+
+function onGame(){
+  const g=games[gi]; if(!g.sim) runSim(g);
+  renderRibbon(); renderAll(); rep.k=0; resetReplay();
+}
+// start on the most lopsided-looking game? start on first game with a Sunday kick-off
+{ const hs=location.hash.slice(1), k=games.findIndex(g=>!g.custom && hs===gameSlug(g)); gi = k>=0 ? k : Math.max(0, games.findIndex(g=>!g.custom && !g.started)); }
+// ---------- the typical game: one box score built from every simulation ----------
+// Score = each team's median points, as touchdowns and field goals. Scorers = the players most likely to score, handed out
+// one touchdown at a time by expected touchdowns. Stat lines = each player's median. Plus the most common exact scores.
+// nearest standard UK fractional price to a decimal price
+const UK_FR=["1/10","1/8","1/6","1/5","1/4","2/7","1/3","2/5","4/9","1/2","8/15","4/7","8/13","4/6","8/11","4/5","5/6","10/11","1/1","11/10","6/5","5/4","11/8","6/4","13/8","7/4","15/8","2/1","9/4","5/2","11/4","3/1","10/3","7/2","4/1","9/2","5/1","11/2","6/1","13/2","7/1","15/2","8/1","9/1","10/1","11/1","12/1","14/1","16/1","20/1","25/1","33/1","40/1","50/1"];
+function ukFrac(d){ let best=UK_FR[0], e=1e9; for(const f of UK_FR){ const [a,b]=f.split("/").map(Number), x=Math.abs(Math.log((1+a/b)/d)); if(x<e){ e=x; best=f; } } return best==="1/1"? "evens" : best; }
+function renderTypical(){
+  const el=$("#typical"), g=games[gi]; if(!el) return;
+  if(!g || !g.S){ el.innerHTML=""; return; }
+  const S=g.S, n=S.n, med=a=>{ const s=Float32Array.from(a).sort(); return s[Math.floor(0.5*s.length)]; }, mean=a=>{ let t=0; for(let i=0;i<a.length;i++) t+=a[i]; return t/a.length; };
+  // touchdowns and field goals chosen so the score matches the team's median points (rounding each count
+  // separately would inflate the total), staying close to the average number of touchdowns
+  const side=t=>{ const r=S.res[t], target=med(r.pts), mtd=mean(r.td); let td=0, fg=0, best=1e9;
+    for(let a=0;a<=8;a++) for(let b=0;b<=6;b++){ const cost=Math.abs(7*a+3*b-target)+0.8*Math.abs(a-mtd); if(cost<best){ best=cost; td=a; fg=b; } }
+    const P=S.players[t], exp=P.map(X=>({X, e:mean(X.td), c:0, hit:0}));
+    for(const X of exp){ let h=0; for(let i=0;i<n;i++) if(X.X.td[i]>=1) h++; X.hit=h/n; }
+    const scorers=[]; for(let k=0;k<td;k++){ exp.sort((a,b)=>(b.e-b.c)-(a.e-a.c)); const w=exp[0]; if(!w || w.e-w.c<=0.02) break; w.c++; scorers.push(w); }
+    const qb=P.find(X=>X.pass), qbl=qb? {name:qb.p.name, yds:Math.round(med(qb.pass)), td:qb.ptd? Math.round(med(qb.ptd)) : 0} : null;
+    const rush=P.filter(X=>!X.pass||true).map(X=>({name:X.p.name, v:Math.round(med(X.rush))})).filter(x=>x.v>=8).sort((a,b)=>b.v-a.v).slice(0,2);
+    const rec=P.map(X=>({name:X.p.name, v:Math.round(med(X.rec)), c:Math.round(med(X.recs))})).filter(x=>x.v>=10).sort((a,b)=>b.v-a.v).slice(0,3);
+    return {t, td, fg, pts:7*td+3*fg, scorers, qbl, rush, rec}; };
+  const A=side(S.away), H=side(S.home), hw=(()=>{ let w=0; const a=S.res[S.home].pts, b=S.res[S.away].pts; for(let i=0;i<n;i++) if(a[i]>b[i]) w++; return w/n; })();
+  // keep the typical score pointing the same way as the simulations: the more likely winner can't trail
+  const favHome=hw>=0.5; if(favHome && H.pts<=A.pts){ H.fg+=Math.ceil((A.pts-H.pts+1)/3); H.pts=7*H.td+3*H.fg; } if(!favHome && A.pts<=H.pts){ A.fg+=Math.ceil((H.pts-A.pts+1)/3); A.pts=7*A.td+3*A.fg; }
+  g.typ = { [S.away]: { pts: A.pts, scorers: A.scorers.map(s=>s.X.p.name) }, [S.home]: { pts: H.pts, scorers: H.scorers.map(s=>s.X.p.name) } };
+  const cnt=new Map(), ap=S.res[S.away].pts, hp=S.res[S.home].pts; for(let i=0;i<n;i++){ const k=ap[i]+"–"+hp[i]; cnt.set(k,(cnt.get(k)||0)+1); }
+  const top=[...cnt.entries()].sort((a,b)=>b[1]-a[1]).slice(0,3);
+  const ta=tinfo(S.away), th=tinfo(S.home), win=favHome? th : ta, wp=favHome? hw : 1-hw;
+  const col=(X,ti)=>`<div class="tg-team">
+      <div class="tg-head">${badge(ti)} <strong>${esc(ti.name)}</strong> <span class="nv mono" style="margin-left:auto">${X.pts}</span></div>
+      <div class="small">${X.td} touchdown${X.td===1?"":"s"} · ${X.fg} field goal${X.fg===1?"":"s"}</div>
+      <div class="tg-sec"><div class="label">Typical scorers</div>${X.scorers.length? X.scorers.map(s=>`<div>🏈 <strong>${esc(s.X.p.name)}</strong> <span class="small">${esc(s.X.p.pos)} · scores in ${pct(s.hit)} of sims · fair price <span class="mono">${(1/s.hit).toFixed(2)}</span> (${ukFrac(1/s.hit)})</span></div>`).join("") : '<div class="small">No touchdown in the typical game</div>'}</div>
+      <div class="tg-sec"><div class="label">Box score (median)</div>
+        ${X.qbl? `<div><strong>${esc(X.qbl.name)}</strong> <span class="mono">${X.qbl.yds}</span> pass yds${X.qbl.td? ` · <span class="mono">${X.qbl.td}</span> TD pass${X.qbl.td===1?"":"es"}`:""}</div>`:""}
+        ${X.rush.map(r=>`<div>${esc(r.name)} <span class="mono">${r.v}</span> rush yds</div>`).join("")}
+        ${X.rec.map(r=>`<div>${esc(r.name)} <span class="mono">${r.c}</span> catch${r.c===1?"":"es"}, <span class="mono">${r.v}</span> yds</div>`).join("")}</div></div>`;
+  el.innerHTML=`<div class="cardhead"><div><h2 class="h2">The typical game</h2><div class="sub">One game built from all ${n.toLocaleString()} simulations: each team's median score, its typical scorers across the simulations and every player's median line. Each scorer's fair price is the odds that match how often he scores in the simulations, with no bookmaker margin: a bookmaker offering more than that is pricing him as a bigger risk than the sim does. For 100,000 simulations, change the number above and press Run again.</div></div></div>
+    <div class="tg-sum"><div><div class="label">Typical final</div><div class="mono tg-big">${esc(ta.abbr)} ${A.pts} – ${H.pts} ${esc(th.abbr)}</div></div>
+      <div><div class="label">${esc(win.abbr)} win</div><div class="mono tg-big">${pct(wp)}</div><div class="small">of simulations</div></div>
+      <div><div class="label">Typical margin</div><div class="mono tg-big">${esc(win.abbr)} by ${Math.abs(H.pts-A.pts)}</div><div class="small">total ${A.pts+H.pts} points</div></div></div>
+    <div class="tg-grid">${col(A,ta)}${col(H,th)}</div>
+    <p class="small" style="margin-top:10px">No single simulation looks exactly like this: it is the middle of all of them. Even the most likely exact score above happens in under 1% of games, so use it as the overall picture, not a prediction to bet on by itself. The percentages are what to compare with bookmakers' prices.</p>`;
+}
+// ---------- automatic weather (works where the page may reach the internet, e.g. GitHub Pages) ----------
+// For open-air stadiums, ask Open-Meteo for the forecast over the three hours from kick-off and fill in wind and
+// temperature. Inside Claude, outside requests are blocked, so this quietly does nothing and the boxes stay manual.
+function throwVerdict(w){
+  if(!w || !w.auto) return null; const wind=+w.wind||0, gust=w.gust||0, notes=[];
+  let level = 0;  // 0 good, 1 tougher, 2 hard
+  if(w.rain==="heavy"){ level=2; notes.push(w.storm? "storms forecast" : `heavy rain (${w.mm} mm an hour)`); }
+  else if(w.rain==="rain"){ level=Math.max(level,1); notes.push(`rain likely (${w.prob}% chance)`); }
+  if(w.snow){ level=Math.max(level,1); notes.push("snow"); }
+  if(wind>=20 || gust>=35){ level=2; notes.push(`${wind} mph wind, gusts ${gust}`); }
+  else if(wind>=15 || gust>=28){ level=Math.max(level,1); notes.push(`${wind} mph wind, gusts ${gust}`); }
+  const icon = w.snow? "❄️" : w.rain? "🌧️" : (wind>=15||gust>=28)? "💨" : "☀️";
+  const head = ["Good throwing conditions","Tougher to throw","Hard to throw"][level];
+  const why = level===0 ? `${wind} mph wind, ${w.prob>=30? w.prob+"% chance of rain" : "dry"}, ${w.temp}°F` : notes.join(" · ");
+  return {level, icon, head, why}; }
+async function autoWeather(){
+  const todo = games.filter(g=>!g.custom && g.geo && g.roofKnown && ["outdoors","open"].includes(g.weather.roof) && !g.weather.wind && !g.weather.temp);
+  await Promise.all(todo.map(async g=>{
+    const t=kickTime(g.kickRaw), now=Date.now(); if(t===null || now>t || t-now>14*864e5) return;
+    const day=new Date(t).toISOString().slice(0,10);
+    try{
+      const url=`https://api.open-meteo.com/v1/forecast?latitude=${g.geo.lat}&longitude=${g.geo.lon}&hourly=temperature_2m,wind_speed_10m,wind_gusts_10m,precipitation,precipitation_probability,weather_code&wind_speed_unit=mph&temperature_unit=fahrenheit&timezone=UTC&start_date=${day}&end_date=${day}`;
+      // no AbortSignal: some hosts relay fetch through postMessage, which cannot carry one; time out with a race instead
+      const r=await Promise.race([fetch(url), new Promise((_,rej)=>setTimeout(()=>rej(new Error("timeout")), 8000))]); if(!r || !r.ok) return; const j=await r.json(), H=j.hourly; if(!H||!H.time) return;
+      const hrs=H.time.map((x,i)=>({i, t:Date.parse(x+"Z")})).filter(x=>x.t>=t-1800e3 && x.t<=t+3*3600e3); if(!hrs.length) return;
+      const avg=k=>hrs.reduce((a,x)=>a+H[k][x.i],0)/hrs.length;
+      if(g.weather.wind || g.weather.temp) return;   // someone typed a value meanwhile: theirs wins
+      const mx=k=>Math.max(...hrs.map(x=>H[k][x.i]??0)), wind=Math.round(avg("wind_speed_10m")), gust=Math.round(mx("wind_gusts_10m")),
+        temp=Math.round(avg("temperature_2m")), mm=avg("precipitation"), prob=Math.round(mx("precipitation_probability")), storm=hrs.some(x=>(H.weather_code[x.i]||0)>=95);
+      const snow = temp<=34 && mm>=0.3, rain = snow? "" : (mm>=2 || storm) ? "heavy" : (mm>=0.5 || prob>=70) ? "rain" : "";
+      g.weather=Object.assign({}, g.weather, {wind:String(wind), temp:String(temp), gust, mm:+mm.toFixed(1), prob, rain, snow, storm,
+        auto:"updated "+new Date().toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})});
+      if(g.S){ if(games[gi]===g) rerun(); else { g.S=null; g.sim=null; } }
+    } catch(e){ /* forecast unavailable here (blocked, offline or timed out): carry on without weather */ }
+  }));
+  renderRibbon();
+}
+// ---------- this week at a glance (pre-calculated at build, so it shows instantly) ----------
+function renderGlance(){
+  const el=$("#glance"); if(!el) return; const G=(typeof GLANCE!=="undefined" && GLANCE) ? GLANCE.games : {};
+  const list=games.filter(g=>!g.custom).map(g=>{ const s=G[g.id] || (g.sim? {hw:g.sim.home_win, a:Math.round(g.sim.exp_away), h:Math.round(g.sim.exp_home)} : null); return {g,s}; })
+    .sort((x,y)=>(x.g.started-y.g.started) || ((kickTime(x.g.kickRaw)||0)-(kickTime(y.g.kickRaw)||0)));
+  const R=(typeof RECORD!=="undefined" && RECORD) ? RECORD : null;
+  const rec = R && R.items ? `<div class="glrec"><span class="label">${esc(R.title)}</span>${R.items.map(([k,v])=>`<span>${esc(k)} <b>${esc(v)}</b></span>`).join("")}</div>` : "";
+  const row=({g,s})=>{ if(!s) return ""; const fav=s.hw>=.5? g.home : g.away, fp=Math.max(s.hw,1-s.hw), st=g.started? (kickStatus(g.kickRaw).split(" · ")[0]) : esc(g.kickoff.replace(" UK","").replace(/^Today · /,"Today "));
+    const v=throwVerdict(g.weather), wx = v && v.level ? ` <span title="${esc(v.head)}">${v.icon}</span>` : "";
+    const sc=(T)=> T ? `${esc(surname(T.n))} <span class="mono">${Math.round(T.p*100)}%</span>` : "";
+    return `<button class="glrow${g.started?" done":""}${games[gi]===g?" on":""}" type="button" data-i="${g.idx}">
+      <span class="glwhen small">${st}${wx}</span>
+      <span class="glteams">${badge(g.away)}<span class="mono glsc">${s.a}</span><span class="small">–</span><span class="mono glsc">${s.h}</span>${badge(g.home)}</span>
+      <span class="glfav"><b>${esc(fav.abbr)}</b> <span class="mono">${Math.round(fp*100)}%</span></span>
+      <span class="glsco small">🏈 ${sc(s.topA)} · ${sc(s.topH)}</span></button>`; };
+  el.innerHTML=`<div class="cardhead"><div><h2 class="h2">This week at a glance</h2><div class="sub">Every game's typical score, the likelier winner and each side's likeliest touchdown scorer. Tap a game for the full breakdown.</div></div></div>${rec}
+    <div class="glhead small"><span>Kick-off</span><span>Typical score</span><span>To win</span><span>Likeliest scorers</span></div><div class="gllist">${list.map(row).join("")}</div>`;
+  el.querySelectorAll(".glrow").forEach(b=>b.addEventListener("click",()=>{ gi=+b.dataset.i; history.replaceState(null,"","#"+gameSlug(games[gi])); onGame(); const m=$("#matchup"); if(m) m.scrollIntoView({behavior:"smooth",block:"start"}); }));
+}
+// ---------- sharing ----------
+function shareUrl(g){ return location.href.split("#")[0]+"#"+gameSlug(g); }
+async function shareGame(g){
+  const ty=g.typ||{}, a=(ty[g.away.abbr]||{}).pts, h=(ty[g.home.abbr]||{}).pts, url=shareUrl(g);
+  const text=`${g.away.name} at ${g.home.name}: the Edge Sim Lab's typical game is ${g.away.abbr} ${a??"?"}–${h??"?"} ${g.home.abbr}.`;
+  try{ if(navigator.share){ await navigator.share({title:"Edge Sim Lab", text, url}); return; } }catch(e){ if(e && e.name==="AbortError") return; }
+  try{ await navigator.clipboard.writeText(text+" "+url); flashBtn("#share","Link copied"); }catch(e){ prompt("Copy this link:", url); }
+}
+function flashBtn(id,msg){ const b=$(id); if(!b) return; const o=b.textContent; b.textContent=msg; setTimeout(()=>{ b.textContent=o; },1600); }
+function saveImage(g){
+  const ty=g.typ; if(!ty) return; const c=document.createElement("canvas"); c.width=1080; c.height=1080; const x=c.getContext("2d");
+  const A=g.away, H=g.home, ta=ty[A.abbr], th=ty[H.abbr];
+  x.fillStyle="#0b1a28"; x.fillRect(0,0,1080,1080);
+  x.fillStyle=A.c1; x.fillRect(0,0,540,300); x.fillStyle=H.c1; x.fillRect(540,0,540,300);
+  x.textAlign="center"; x.fillStyle=textOn(A.c1); x.font="800 120px Archivo, Arial"; x.fillText(A.abbr,270,170); x.font="800 64px Archivo, Arial"; x.fillText(String(ta.pts),270,260);
+  x.fillStyle=textOn(H.c1); x.font="800 120px Archivo, Arial"; x.fillText(H.abbr,810,170); x.font="800 64px Archivo, Arial"; x.fillText(String(th.pts),810,260);
+  x.fillStyle="#69d7c9"; x.font="700 40px Archivo, Arial"; x.fillText("THE TYPICAL GAME",540,380);
+  x.fillStyle="#f5f8f9"; x.font="400 32px Archivo, Arial"; x.fillText(`${A.name} at ${H.name}`,540,430);
+  const hw=g.sim? g.sim.home_win : .5, fav=hw>=.5? H : A; x.font="700 44px Archivo, Arial"; x.fillText(`${fav.abbr} win ${Math.round(Math.max(hw,1-hw)*100)}% of ${(g.runN||nSims).toLocaleString()} simulations`,540,520);
+  x.font="700 34px Archivo, Arial"; x.fillStyle="#69d7c9"; x.fillText("Typical scorers",540,610); x.fillStyle="#f5f8f9"; x.font="400 32px Archivo, Arial";
+  [...ta.scorers.map(n=>`${A.abbr} · ${n}`), ...th.scorers.map(n=>`${H.abbr} · ${n}`)].slice(0,6).forEach((s,i)=>x.fillText(s,540,660+i*48));
+  x.fillStyle="#9fb3c4"; x.font="400 26px Archivo, Arial"; x.fillText("Edge Sim Lab · simulations, not betting advice · 18+ BeGambleAware.org",540,1040);
+  const a=document.createElement("a"); a.download=`edge-sim-lab-${gameSlug(g)}.png`; a.href=c.toDataURL("image/png"); document.body.appendChild(a); a.click(); a.remove(); flashBtn("#shareimg","Saved");
+}
+function renderAll(){ renderGlance(); renderMatchup(); renderTypical(); renderPlayers(); wireMatchup(); if(typeof renderPicks==="function") renderPicks(); }
+function rerun(){ const g=games[gi]; const info=$("#runinfo"); if(info) info.textContent="Simulating…";
+  setTimeout(()=>{ runSim(g); renderRibbon(); renderAll(); rep.k=0; resetReplay(); }, 30); }
+function wireMatchup(){
+  const g=games[gi];
+  const wupd=()=>{ g.weather=Object.assign({}, g.weather, {wind:($("#wWind")||{}).value||"", temp:($("#wTemp")||{}).value||"", auto:null}); rerun(); };
+  ["#wWind","#wTemp"].forEach(id=>{ const el=$(id); if(el) el.addEventListener("change",wupd); });
+  $("#rerun").addEventListener("click", rerun);
+  $("#share").addEventListener("click", ()=>shareGame(g)); $("#shareimg").addEventListener("click", ()=>saveImage(g));
+  $("#nsims").addEventListener("change", e=>{ nSims=+e.target.value; rerun(); });
+  if(!g.custom) return;
+  const upd=()=>{ g.away=tinfo($("#cAway").value); g.home=tinfo($("#cHome").value); g.neutral=$("#cNeutral").checked;
+    g.lineMode=$("#cLine").value; g.restDiff=parseInt(($("#cRest")||{}).value)||0;
+    g.market = g.lineMode==="set" ? {spread_home: -(parseFloat(($("#cSpread")||{}).value)||-3), total: parseFloat(($("#cTotal")||{}).value)||47.5} : null;
+    if(g.home.abbr===g.away.abbr){ $("#runinfo").textContent="Pick two different teams"; return; }
+    rerun(); };
+  ["#cAway","#cHome","#cNeutral","#cLine","#cSpread","#cTotal","#cRest"].forEach(id=>{ const el=$(id); if(el) el.addEventListener("change",upd); });
+}
+onGame(); route();
+const mq = matchMedia("(prefers-color-scheme: dark)"); mq.addEventListener && mq.addEventListener("change",()=>{renderAll();});
+new MutationObserver(()=>{renderAll();}).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+})();
+</script>
