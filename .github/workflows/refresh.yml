@@ -1,0 +1,48 @@
+name: Refresh Sim Lab
+on:
+  schedule:
+    - cron: "7 * * * *"    # every hour at :07 (UTC); a run that finds no new data changes nothing
+  workflow_dispatch:       # "Run workflow" button on the Actions tab: always rebuilds and publishes
+permissions:
+  contents: write          # save index.html and the data fingerprint in the repository
+  pages: write             # publish the live page
+  id-token: write
+concurrency:
+  group: refresh
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - uses: actions/setup-node@v4
+        with: { node-version: "20" }
+      - run: pip install -r requirements.txt
+      - id: build
+        run: python refresh.py
+        env:
+          FORCE: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
+      - name: Save the new page in the repository
+        if: steps.build.outputs.changed == 'true'
+        run: |
+          git config user.name "edge-sim-lab-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html data_fingerprint.txt history viz/record.json
+          git diff --cached --quiet || (git commit -m "Auto-refresh $(date -u '+%Y-%m-%d %H:%M') UTC" && git push)
+      - name: Publish the live page
+        if: steps.build.outputs.changed == 'true'
+        run: mkdir -p _site && cp index.html _site/
+      - if: steps.build.outputs.changed == 'true'
+        uses: actions/configure-pages@v5
+      - if: steps.build.outputs.changed == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with: { path: _site }
+      - if: steps.build.outputs.changed == 'true'
+        id: deploy
+        uses: actions/deploy-pages@v4
