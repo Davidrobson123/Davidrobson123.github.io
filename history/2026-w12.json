@@ -1,0 +1,258 @@
+{
+"2026_12_GB_LA": {
+"hw": 0.5856,
+"a": 20,
+"h": 23,
+"topA": {
+"n": "Josh Jacobs",
+"pos": "RB",
+"p": 0.306
+},
+"topH": {
+"n": "Kyren Williams",
+"pos": "RB",
+"p": 0.511
+},
+"saved": "2026-11-24 06:57 UTC"
+},
+"2026_12_CHI_DET": {
+"hw": 0.4158,
+"a": 30,
+"h": 27,
+"topA": {
+"n": "D'Andre Swift",
+"pos": "RB",
+"p": 0.548
+},
+"topH": {
+"n": "Jahmyr Gibbs",
+"pos": "RB",
+"p": 0.718
+},
+"saved": "2026-11-24 06:57 UTC"
+},
+"2026_12_PHI_DAL": {
+"hw": 0.7541,
+"a": 20,
+"h": 28,
+"topA": {
+"n": "Saquon Barkley",
+"pos": "RB",
+"p": 0.519
+},
+"topH": {
+"n": "Javonte Williams",
+"pos": "RB",
+"p": 0.566
+},
+"saved": "2026-11-24 06:57 UTC"
+},
+"2026_12_KC_BUF": {
+"hw": 0.5916,
+"a": 23,
+"h": 24,
+"topA": {
+"n": "Kenneth Walker III",
+"pos": "RB",
+"p": 0.446
+},
+"topH": {
+"n": "James Cook",
+"pos": "RB",
+"p": 0.54
+},
+"saved": "2026-11-24 06:57 UTC"
+},
+"2026_12_DEN_PIT": {
+"hw": 0.4024,
+"a": 20,
+"h": 17,
+"topA": {
+"n": "Jonah Coleman",
+"pos": "RB",
+"p": 0.438
+},
+"topH": {
+"n": "Jaylen Warren",
+"pos": "RB",
+"p": 0.293
+},
+"saved": "2026-11-24 06:57 UTC"
+},
+"2026_12_NO_CIN": {
+"hw": 0.7971,
+"a": 20,
+"h": 30,
+"topA": {
+"n": "Alvin Kamara",
+"pos": "RB",
+"p": 0.258
+},
+"topH": {
+"n": "Chase Brown",
+"pos": "RB",
+"p": 0.533
+},
+"saved": "2026-11-24 06:57 UTC"
+},
+"2026_12_LV_CLE": {
+"hw": 0.6409,
+"a": 17,
+"h": 23,
+"topA": {
+"n": "Ashton Jeanty",
+"pos": "RB",
+"p": 0.33
+},
+"topH": {
+"n": "Quinshon Judkins",
+"pos": "RB",
+"p": 0.53
+},
+"saved": "2026-11-24 06:57 UTC"
+},
+"2026_12_BAL_HOU": {
+"hw": 0.7045,
+"a": 20,
+"h": 27,
+"topA": {
+"n": "Derrick Henry",
+"pos": "RB",
+"p": 0.595
+},
+"topH": {
+"n": "Nico Collins",
+"pos": "WR",
+"p": 0.325
+},
+"saved": "2026-11-24 06:57 UTC"
+},
+"2026_12_NYG_IND": {
+"hw": 0.2976,
+"a": 24,
+"h": 17,
+"topA": {
+"n": "Cam Skattebo",
+"pos": "RB",
+"p": 0.582
+},
+"topH": {
+"n": "Jonathan Taylor",
+"pos": "RB",
+"p": 0.432
+},
+"saved": "2026-11-24 06:57 UTC"
+},
+"2026_12_NYJ_MIA": {
+"hw": 0.3794,
+"a": 23,
+"h": 17,
+"topA": {
+"n": "Breece Hall",
+"pos": "RB",
+"p": 0.313
+},
+"topH": {
+"n": "Ollie Gordon II",
+"pos": "RB",
+"p": 0.418
+},
+"saved": "2026-11-24 06:57 UTC"
+},
+"2026_12_ATL_MIN": {
+"hw": 0.7296,
+"a": 17,
+"h": 24,
+"topA": {
+"n": "Bijan Robinson",
+"pos": "RB",
+"p": 0.486
+},
+"topH": {
+"n": "Aaron Jones",
+"pos": "RB",
+"p": 0.511
+},
+"saved": "2026-11-24 06:57 UTC"
+},
+"2026_12_TEN_JAX": {
+"hw": 0.8848,
+"a": 16,
+"h": 31,
+"topA": {
+"n": "Tony Pollard",
+"pos": "RB",
+"p": 0.386
+},
+"topH": {
+"n": "Bhayshul Tuten",
+"pos": "RB",
+"p": 0.523
+},
+"saved": "2026-11-24 06:57 UTC"
+},
+"2026_12_WAS_ARI": {
+"hw": 0.2618,
+"a": 24,
+"h": 17,
+"topA": {
+"n": "Rachaad White",
+"pos": "RB",
+"p": 0.423
+},
+"topH": {
+"n": "Tyler Allgeier",
+"pos": "RB",
+"p": 0.291
+},
+"saved": "2026-11-24 06:57 UTC"
+},
+"2026_12_SEA_SF": {
+"hw": 0.5986,
+"a": 21,
+"h": 24,
+"topA": {
+"n": "AJ Barner",
+"pos": "TE",
+"p": 0.327
+},
+"topH": {
+"n": "Christian McCaffrey",
+"pos": "RB",
+"p": 0.564
+},
+"saved": "2026-11-24 06:57 UTC"
+},
+"2026_12_NE_LAC": {
+"hw": 0.5504,
+"a": 17,
+"h": 19,
+"topA": {
+"n": "Rhamondre Stevenson",
+"pos": "RB",
+"p": 0.327
+},
+"topH": {
+"n": "Omarion Hampton",
+"pos": "RB",
+"p": 0.316
+},
+"saved": "2026-11-24 06:57 UTC"
+},
+"2026_12_CAR_TB": {
+"hw": 0.5955,
+"a": 20,
+"h": 23,
+"topA": {
+"n": "Chuba Hubbard",
+"pos": "RB",
+"p": 0.546
+},
+"topH": {
+"n": "Bucky Irving",
+"pos": "RB",
+"p": 0.564
+},
+"saved": "2026-11-24 06:57 UTC"
+}
+}
