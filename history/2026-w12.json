@@ -16,68 +16,68 @@
 "saved": "2026-11-25 22:29 UTC"
 },
 "2026_12_CHI_DET": {
-"hw": 0.4525,
-"a": 28,
+"hw": 0.4492,
+"a": 29,
 "h": 27,
 "topA": {
 "n": "D'Andre Swift",
 "pos": "RB",
-"p": 0.564
+"p": 0.622
 },
 "topH": {
 "n": "Jahmyr Gibbs",
 "pos": "RB",
-"p": 0.733
+"p": 0.731
 },
-"saved": "2026-11-26 05:00 UTC"
+"saved": "2026-11-26 15:05 UTC"
 },
 "2026_12_PHI_DAL": {
-"hw": 0.7577,
+"hw": 0.756,
 "a": 20,
-"h": 29,
+"h": 30,
 "topA": {
 "n": "Saquon Barkley",
 "pos": "RB",
-"p": 0.527
+"p": 0.531
 },
 "topH": {
 "n": "Javonte Williams",
 "pos": "RB",
-"p": 0.592
+"p": 0.583
 },
-"saved": "2026-11-26 05:00 UTC"
+"saved": "2026-11-26 15:05 UTC"
 },
 "2026_12_KC_BUF": {
 "hw": 0.5889,
 "a": 21,
 "h": 24,
 "topA": {
-"n": "Kenneth Walker III",
+"n": "Emmett Johnson",
 "pos": "RB",
-"p": 0.435
+"p": 0.576
 },
 "topH": {
 "n": "James Cook",
 "pos": "RB",
-"p": 0.531
+"p": 0.538
 },
-"saved": "2026-11-26 05:00 UTC"
+"saved": "2026-11-26 15:05 UTC"
 },
 "2026_12_DEN_PIT": {
-"hw": 0.3694,
+"hw": 0.3329,
 "a": 20,
 "h": 16,
 "topA": {
 "n": "Jonah Coleman",
 "pos": "RB",
-"p": 0.424
+"p": 0.578
 },
 "topH": {
 "n": "Jaylen Warren",
 "pos": "RB",
-"p": 0.273
+"p": 0.262
 },
-"saved": "2026-11-26 05:00 UTC"
+"saved": "2026-11-26 15:05 UTC"
 },
 "2026_12_NO_CIN": {
 "hw": 0.7841,
@@ -86,30 +86,30 @@
 "topA": {
 "n": "Alvin Kamara",
 "pos": "RB",
-"p": 0.251
+"p": 0.256
 },
 "topH": {
 "n": "Chase Brown",
 "pos": "RB",
-"p": 0.515
+"p": 0.517
 },
-"saved": "2026-11-26 05:00 UTC"
+"saved": "2026-11-26 15:05 UTC"
 },
 "2026_12_LV_CLE": {
-"hw": 0.6491,
+"hw": 0.6374,
 "a": 17,
-"h": 22,
+"h": 23,
 "topA": {
 "n": "Ashton Jeanty",
 "pos": "RB",
-"p": 0.311
+"p": 0.319
 },
 "topH": {
 "n": "Quinshon Judkins",
 "pos": "RB",
-"p": 0.508
+"p": 0.517
 },
-"saved": "2026-11-26 05:00 UTC"
+"saved": "2026-11-26 15:05 UTC"
 },
 "2026_12_BAL_HOU": {
 "hw": 0.6939,
@@ -118,14 +118,14 @@
 "topA": {
 "n": "Derrick Henry",
 "pos": "RB",
-"p": 0.613
+"p": 0.611
 },
 "topH": {
 "n": "Nico Collins",
 "pos": "WR",
-"p": 0.326
+"p": 0.335
 },
-"saved": "2026-11-26 05:00 UTC"
+"saved": "2026-11-26 15:05 UTC"
 },
 "2026_12_NYG_IND": {
 "hw": 0.2945,
@@ -134,14 +134,14 @@
 "topA": {
 "n": "Cam Skattebo",
 "pos": "RB",
-"p": 0.579
+"p": 0.585
 },
 "topH": {
 "n": "Jonathan Taylor",
 "pos": "RB",
-"p": 0.435
+"p": 0.439
 },
-"saved": "2026-11-26 05:00 UTC"
+"saved": "2026-11-26 15:05 UTC"
 },
 "2026_12_NYJ_MIA": {
 "hw": 0.354,
@@ -150,14 +150,14 @@
 "topA": {
 "n": "Breece Hall",
 "pos": "RB",
-"p": 0.322
+"p": 0.324
 },
 "topH": {
 "n": "Ollie Gordon II",
 "pos": "RB",
-"p": 0.406
+"p": 0.41
 },
-"saved": "2026-11-26 05:00 UTC"
+"saved": "2026-11-26 15:05 UTC"
 },
 "2026_12_ATL_MIN": {
 "hw": 0.7302,
@@ -166,14 +166,14 @@
 "topA": {
 "n": "Bijan Robinson",
 "pos": "RB",
-"p": 0.477
+"p": 0.478
 },
 "topH": {
 "n": "Aaron Jones",
 "pos": "RB",
-"p": 0.506
+"p": 0.498
 },
-"saved": "2026-11-26 05:00 UTC"
+"saved": "2026-11-26 15:05 UTC"
 },
 "2026_12_TEN_JAX": {
 "hw": 0.8856,
@@ -182,30 +182,30 @@
 "topA": {
 "n": "Tony Pollard",
 "pos": "RB",
-"p": 0.457
+"p": 0.46
 },
 "topH": {
 "n": "Bhayshul Tuten",
 "pos": "RB",
-"p": 0.528
+"p": 0.535
 },
-"saved": "2026-11-26 05:00 UTC"
+"saved": "2026-11-26 15:05 UTC"
 },
 "2026_12_WAS_ARI": {
-"hw": 0.2734,
+"hw": 0.2844,
 "a": 24,
 "h": 17,
 "topA": {
 "n": "Rachaad White",
 "pos": "RB",
-"p": 0.346
+"p": 0.354
 },
 "topH": {
 "n": "Tyler Allgeier",
 "pos": "RB",
-"p": 0.32
+"p": 0.318
 },
-"saved": "2026-11-26 05:00 UTC"
+"saved": "2026-11-26 15:05 UTC"
 },
 "2026_12_SEA_SF": {
 "hw": 0.5793,
@@ -214,14 +214,14 @@
 "topA": {
 "n": "AJ Barner",
 "pos": "TE",
-"p": 0.325
+"p": 0.323
 },
 "topH": {
 "n": "Christian McCaffrey",
 "pos": "RB",
-"p": 0.54
+"p": 0.545
 },
-"saved": "2026-11-26 05:00 UTC"
+"saved": "2026-11-26 15:05 UTC"
 },
 "2026_12_NE_LAC": {
 "hw": 0.4472,
@@ -230,14 +230,14 @@
 "topA": {
 "n": "Rhamondre Stevenson",
 "pos": "RB",
-"p": 0.351
+"p": 0.348
 },
 "topH": {
 "n": "Omarion Hampton",
 "pos": "RB",
-"p": 0.294
+"p": 0.298
 },
-"saved": "2026-11-26 05:00 UTC"
+"saved": "2026-11-26 15:05 UTC"
 },
 "2026_12_CAR_TB": {
 "hw": 0.5955,
@@ -246,13 +246,13 @@
 "topA": {
 "n": "Chuba Hubbard",
 "pos": "RB",
-"p": 0.549
+"p": 0.553
 },
 "topH": {
 "n": "Bucky Irving",
 "pos": "RB",
-"p": 0.564
+"p": 0.561
 },
-"saved": "2026-11-26 05:00 UTC"
+"saved": "2026-11-26 15:05 UTC"
 }
 }
