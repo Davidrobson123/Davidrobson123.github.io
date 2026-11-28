@@ -91,25 +91,25 @@
 "topH": {
 "n": "Chase Brown",
 "pos": "RB",
-"p": 0.506
+"p": 0.508
 },
-"saved": "2026-11-28 01:56 UTC"
+"saved": "2026-11-28 10:17 UTC"
 },
 "2026_12_LV_CLE": {
-"hw": 0.6491,
+"hw": 0.6444,
 "a": 17,
-"h": 22,
+"h": 21,
 "topA": {
 "n": "Ashton Jeanty",
 "pos": "RB",
-"p": 0.307
+"p": 0.302
 },
 "topH": {
 "n": "Quinshon Judkins",
 "pos": "RB",
-"p": 0.514
+"p": 0.504
 },
-"saved": "2026-11-28 01:56 UTC"
+"saved": "2026-11-28 10:17 UTC"
 },
 "2026_12_BAL_HOU": {
 "hw": 0.6939,
@@ -118,14 +118,14 @@
 "topA": {
 "n": "Derrick Henry",
 "pos": "RB",
-"p": 0.611
+"p": 0.612
 },
 "topH": {
 "n": "Nico Collins",
 "pos": "WR",
-"p": 0.332
+"p": 0.375
 },
-"saved": "2026-11-28 01:56 UTC"
+"saved": "2026-11-28 10:17 UTC"
 },
 "2026_12_NYG_IND": {
 "hw": 0.3186,
@@ -134,14 +134,14 @@
 "topA": {
 "n": "Cam Skattebo",
 "pos": "RB",
-"p": 0.579
+"p": 0.582
 },
 "topH": {
 "n": "Jonathan Taylor",
 "pos": "RB",
-"p": 0.45
+"p": 0.554
 },
-"saved": "2026-11-28 01:56 UTC"
+"saved": "2026-11-28 10:17 UTC"
 },
 "2026_12_NYJ_MIA": {
 "hw": 0.3204,
@@ -150,14 +150,14 @@
 "topA": {
 "n": "Breece Hall",
 "pos": "RB",
-"p": 0.32
+"p": 0.326
 },
 "topH": {
 "n": "Ollie Gordon II",
 "pos": "RB",
-"p": 0.396
+"p": 0.389
 },
-"saved": "2026-11-28 01:56 UTC"
+"saved": "2026-11-28 10:17 UTC"
 },
 "2026_12_ATL_MIN": {
 "hw": 0.7302,
@@ -166,14 +166,14 @@
 "topA": {
 "n": "Bijan Robinson",
 "pos": "RB",
-"p": 0.473
+"p": 0.487
 },
 "topH": {
 "n": "Aaron Jones",
 "pos": "RB",
-"p": 0.504
+"p": 0.511
 },
-"saved": "2026-11-28 01:56 UTC"
+"saved": "2026-11-28 10:17 UTC"
 },
 "2026_12_TEN_JAX": {
 "hw": 0.8802,
@@ -182,14 +182,14 @@
 "topA": {
 "n": "Tony Pollard",
 "pos": "RB",
-"p": 0.449
+"p": 0.454
 },
 "topH": {
-"n": "Bhayshul Tuten",
+"n": "Chris Rodriguez Jr.",
 "pos": "RB",
-"p": 0.516
+"p": 0.553
 },
-"saved": "2026-11-28 01:56 UTC"
+"saved": "2026-11-28 10:17 UTC"
 },
 "2026_12_WAS_ARI": {
 "hw": 0.2844,
@@ -198,14 +198,14 @@
 "topA": {
 "n": "Rachaad White",
 "pos": "RB",
-"p": 0.348
+"p": 0.343
 },
 "topH": {
 "n": "Tyler Allgeier",
 "pos": "RB",
-"p": 0.318
+"p": 0.317
 },
-"saved": "2026-11-28 01:56 UTC"
+"saved": "2026-11-28 10:17 UTC"
 },
 "2026_12_SEA_SF": {
 "hw": 0.451,
@@ -214,14 +214,14 @@
 "topA": {
 "n": "AJ Barner",
 "pos": "TE",
-"p": 0.349
+"p": 0.341
 },
 "topH": {
 "n": "Christian McCaffrey",
 "pos": "RB",
-"p": 0.494
+"p": 0.514
 },
-"saved": "2026-11-28 01:56 UTC"
+"saved": "2026-11-28 10:17 UTC"
 },
 "2026_12_NE_LAC": {
 "hw": 0.3998,
@@ -230,14 +230,14 @@
 "topA": {
 "n": "Rhamondre Stevenson",
 "pos": "RB",
-"p": 0.353
+"p": 0.362
 },
 "topH": {
 "n": "Omarion Hampton",
 "pos": "RB",
-"p": 0.282
+"p": 0.383
 },
-"saved": "2026-11-28 01:56 UTC"
+"saved": "2026-11-28 10:17 UTC"
 },
 "2026_12_CAR_TB": {
 "hw": 0.5955,
@@ -246,13 +246,13 @@
 "topA": {
 "n": "Chuba Hubbard",
 "pos": "RB",
-"p": 0.548
+"p": 0.546
 },
 "topH": {
 "n": "Bucky Irving",
 "pos": "RB",
-"p": 0.556
+"p": 0.557
 },
-"saved": "2026-11-28 01:56 UTC"
+"saved": "2026-11-28 10:17 UTC"
 }
 }
